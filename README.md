@@ -4,10 +4,13 @@ This repository is for ML Team
 
 TensorFlow:
 https://www.tensorflow.org/get_started/
+
 TF Github
 https://github.com/tensorflow
+
 化伴侣CNN Github
 https://github.com/isiosia/models/tree/master/slim
+
 TR-slim的CNN 练习视频1
 http://edu.csdn.net/course/detail/5278
 
