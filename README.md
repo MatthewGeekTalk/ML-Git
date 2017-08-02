@@ -31,3 +31,10 @@ https://icn.mo.sap.corp/
 
 GPU by SAP
 http://dexxpl33988012.xxp.sap.corp:12000/ 
+
+Here is learning page for Machine Learning concept including Mathematics proving. (Strongly suggested)
+https://www.zybuluo.com/hanbingtao/note/433855 
+
+Here is Dr. Wu’s git, you could find all materials and code:
+https://github.com/G-wave
+
