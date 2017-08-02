@@ -38,3 +38,5 @@ https://www.zybuluo.com/hanbingtao/note/433855
 Here is Dr. Wu’s git, you could find all materials and code:
 https://github.com/G-wave
 
+Active Pycharm
+http://idea.irfen.me/ 
