@@ -14,6 +14,9 @@ https://github.com/isiosia/models/tree/master/slim
 TR-slim的CNN 练习视频1
 http://edu.csdn.net/course/detail/5278
 
+Open CV 视频
+http://edu.csdn.net/course/detail/5510
+
 Coursera - Machine Learning  - by Andrew Ng
 https://www.coursera.org/learn/machine-learning
 
