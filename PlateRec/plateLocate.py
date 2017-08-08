@@ -34,7 +34,10 @@ class CPlateLocate:
         return cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
 
     def __img_sobel(self):
-        return cv2.Sobel(self.img, cv2.CV_8U, 1, 0, ksize=3)
+        absX = cv2.Sobel(self.img, cv2.CV_8U, 1, 0, ksize=3)
+        absY = cv2.Sobel(self.img, cv2.CV_8U, 0, 1, ksize=3)
+        dst = cv2.addWeighted(absX,0.5,absY,0.5,0)   
+        return dst
 
     def __img_binary(self):
         ret, binary = cv2.threshold(self.img, 0, 255, cv2.THRESH_OTSU + cv2.THRESH_BINARY)
