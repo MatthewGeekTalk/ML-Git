@@ -1,4 +1,4 @@
-import cv2
+﻿import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -7,7 +7,7 @@ class CPlateLocate:
     def __init__(self):
         self.m_GaussianBlurSize = 0.
         self.img = object
-        self.imgorg = object
+        self.imgOrg = object
         self.im2 = object
         self.morphH = 0
         self.morphW = 0
