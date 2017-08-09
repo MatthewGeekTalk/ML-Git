@@ -30,7 +30,6 @@ class CPlateLocate:
         self.img = self.__img_sobel()
         self.img = self.__img_binary()
         self.img = self.__img_morph_close()
-        cv2.imshow('morph', self.img)
         self.region, self.safe_region = self.__find_plate_number_region()
         self.plates = self.__detect_region()
 
