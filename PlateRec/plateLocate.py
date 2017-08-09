@@ -94,7 +94,7 @@ class CPlateLocate:
             safe_region.append(safe_box)
         return region, safe_region
 
-    def __calc_safe_rect(self, cnt, height, width):
+    def __calc_safe_rect(self, cnt):
         x, y, w, h = cv2.boundingRect(cnt)
         f = lambda x: x if (x > 0) else 0
         f2 = lambda x, y, h: x + y - 1 if (x + y < h) else h - 1
@@ -162,10 +162,9 @@ class CPlateLocate:
 
     def img_show(self):
         cv2.imshow('img', self.imgOrg)
-        for i in range(len(self.plates)):
-            cv2.imshow('plates_' + str(i), self.plates[i])
+        # for i in range(len(self.plates)):
+        #     cv2.imshow('plates_' + str(i), self.plates[i])
         cv2.waitKey(0)
-
 
 if __name__ == '__main__':
     path = input('Please input your image path:')
