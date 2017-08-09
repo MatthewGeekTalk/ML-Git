@@ -31,8 +31,8 @@ class CPlateLocate:
         self.img = self.__img_binary()
         self.img = self.__img_morph_close()
         cv2.imshow('morph', self.img)
-        self.region, self.safe_region = self.__findPlateNumberRegion()
-        self.plates = self.__detectRegion()
+        self.region, self.safe_region = self.__find_plate_number_region()
+        self.plates = self.__detect_region()
 
     def set_gaussian_size(self, gaussian_blur_size):
         self.m_GaussianBlurSize = gaussian_blur_size
@@ -64,7 +64,7 @@ class CPlateLocate:
         element = cv2.getStructuringElement(cv2.MORPH_RECT, (self.morphW, self.morphH))
         return cv2.morphologyEx(self.img, cv2.MORPH_CLOSE, element)
 
-    def __findPlateNumberRegion(self):
+    def __find_plate_number_region(self):
         region = []
         safe_region = []
         img_find = self.img.copy()
@@ -85,7 +85,7 @@ class CPlateLocate:
                 continue
             if self.__verify_value(height, width):
                 continue
-            err, safe_rect = self.__calc_safe_rect(cnt, self.imgOrg.shape[0], self.imgOrg.shape[1])
+            err, safe_rect = self.__calc_safe_rect(cnt)
             if not err:
                 continue
             safe_box = cv2.boxPoints(safe_rect)
@@ -100,8 +100,8 @@ class CPlateLocate:
         f2 = lambda x, y, h: x + y - 1 if (x + y < h) else h - 1
         t1_x = f(x)
         t1_y = f(y)
-        br_x = f2(x, w, width)
-        br_y = f2(y, h, height)
+        br_x = f2(x, w, self.imgOrg.shape[0])
+        br_y = f2(y, h, self.imgOrg.shape[1])
         roi_width = br_x - t1_x
         roi_height = br_y - t1_y
 
@@ -125,7 +125,7 @@ class CPlateLocate:
         else:
             return False
 
-    def __detectRegion(self):
+    def __detect_region(self):
         plates = []
         for box in self.safe_region:
             cv2.drawContours(self.imgOrg, [box], 0, (0, 0, 255), 2)
