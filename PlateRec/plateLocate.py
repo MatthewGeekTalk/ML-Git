@@ -75,8 +75,8 @@ class CPlateLocate:
             rect = cv2.minAreaRect(cnt)
             box = cv2.boxPoints(rect)
             box = np.int0(box)
-            height = abs(box[0][1] - box[2][1])
-            width = abs(box[0][0] - box[2][0])
+            height = int(rect[1][1])
+            width = int(rect[1][0])
             if height == 0 or width == 0:
                 continue
             if self.__verify_value(height, width):
