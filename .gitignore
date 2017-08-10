@@ -1,3 +1,4 @@
 .gitignore
 .idea/
 Test/**/*.py
+PlateRec/__pycache__/
