@@ -84,29 +84,23 @@ class CPlateLocate:
                 continue
             if self.__verify_value(height, width):
                 continue
-            err, safe_rect = self.__calc_safe_rect(cnt)
+            err, safe_rect = self.__calc_safe_rect(box)
             if not err:
                 continue
             safe_box = cv2.boxPoints(safe_rect)
             safe_box = np.int0(safe_box)
+            safe_height = abs(safe_box[0][1] - safe_box[2][1])
+            safe_width = abs(safe_box[0][0] - safe_box[2][0])
+            if self.__verify_value(safe_height, safe_width):
+                continue
             region.append(box)
             safe_region.append(safe_box)
         return region, safe_region
 
-    def __calc_safe_rect(self, cnt):
-        x, y, w, h = cv2.boundingRect(cnt)
-        f = lambda x: x if (x > 0) else 0
-        f2 = lambda x, y, h: x + y - 1 if (x + y < h) else h - 1
-        t1_x = f(x)
-        t1_y = f(y)
-        br_x = f2(x, w, self.imgOrg.shape[0])
-        br_y = f2(y, h, self.imgOrg.shape[1])
-        roi_width = br_x - t1_x
-        roi_height = br_y - t1_y
-
-        if roi_width <= 0 or roi_height <= 0:
-            return False, tuple()
-        return True, ((t1_x, t1_y), (roi_width, roi_height), 0)
+    def __calc_safe_rect(self, box):
+        box_reshape = np.reshape(box, (box.shape[0], box.shape[1], 1))
+        x, y, w, h = cv2.boundingRect(box_reshape)
+        return True, ((x + (w / 2), y + (h / 2)), (w, h), 0)
 
     def __verify_value(self, height, width):
         error = self.verify_error
@@ -117,8 +111,8 @@ class CPlateLocate:
         rmax = aspect + aspect * error
         area = float(height) * float(width)
         r = float(width) / float(height)
-        if r < 1:
-            r = float(height) / float(width)
+        # if r < 1:
+        #     r = float(height) / float(width)
         if (area < vmin or area > vmax) or (r < rmin or r > rmax):
             return True
         else:
@@ -165,14 +159,15 @@ class CPlateLocate:
         #     cv2.imshow('plates_' + str(i), self.plates[i])
         cv2.waitKey(0)
 
+
 if __name__ == '__main__':
     path = input('Please input your image path:')
     plate_locate = CPlateLocate()
     plate_locate.read_img(path)
     plate_locate.set_gaussian_size(5)
     plate_locate.set_morph_hw(17, 3)
-    plate_locate.set_verify_value(1, 200, 4, .75)
+    plate_locate.set_verify_value(1, 200, 4, .5)
     plate_locate.plate_locate()
     plate_locate.img_show()
 
-    # C:\\Users\\zzfancitizen\\Desktop\\plate4.jpg
+    # C:\\Users\\i072179\\PycharmProjects\\ML-Git\\Material\\plate1.jpg
