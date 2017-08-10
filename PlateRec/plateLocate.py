@@ -94,7 +94,8 @@ class CPlateLocate:
             safe_region.append(safe_box)
         return region, safe_region
 
-    def __calc_safe_rect(self, box):
+    @staticmethod
+    def __calc_safe_rect(box):
         box_reshape = np.reshape(box, (box.shape[0], box.shape[1], 1))
         x, y, w, h = cv2.boundingRect(box_reshape)
         return True, ((x + (w / 2), y + (h / 2)), (w, h), 0)
