@@ -166,7 +166,7 @@ if __name__ == '__main__':
     plate_locate.read_img(path)
     plate_locate.set_gaussian_size(5)
     plate_locate.set_morph_hw(17, 3)
-    plate_locate.set_verify_value(1, 200, 4, .5)
+    plate_locate.set_verify_value(1, 100, 4, .5)
     plate_locate.plate_locate()
     plate_locate.img_show()
 
