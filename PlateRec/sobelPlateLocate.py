@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-
+import os
 
 class CPlateLocate:
     def __init__(self):
@@ -159,6 +159,7 @@ class CPlateLocate:
 
 
 if __name__ == '__main__':
+    print('Image path: %s' % str(os.path.abspath('../Material')).replace('\\', '\\\\'))
     path = input('Please input your image path:')
     plate_locate = CPlateLocate()
     plate_locate.read_img(path)
@@ -167,5 +168,3 @@ if __name__ == '__main__':
     plate_locate.set_verify_value(1, 100, 4, .5)
     plate_locate.plate_locate()
     plate_locate.img_show()
-
-    # C:\\Users\\i072179\\PycharmProjects\\ML-Git\\Material\\plate1.jpg
