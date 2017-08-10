@@ -3,7 +3,7 @@ import numpy as np
 import os
 
 
-class CPlateLocate:
+class SobelPlateLocate:
     def __init__(self):
         self.m_GaussianBlurSize = 0.
         self.img = object
@@ -162,7 +162,7 @@ class CPlateLocate:
 if __name__ == '__main__':
     print('Image path: %s' % str(os.path.abspath('../Material')).replace('\\', '\\\\'))
     path = input('Please input your image path:')
-    plate_locate = CPlateLocate()
+    plate_locate = SobelPlateLocate()
     plate_locate.read_img(path)
     plate_locate.set_gaussian_size(5)
     plate_locate.set_morph_hw(17, 3)
