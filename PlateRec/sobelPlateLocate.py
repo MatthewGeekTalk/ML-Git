@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import os
 
+
 class CPlateLocate:
     def __init__(self):
         self.m_GaussianBlurSize = 0.
