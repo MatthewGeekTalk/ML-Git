@@ -19,9 +19,9 @@ class CPlateLocate:
         self.verify_aspect = 0
         self.verify_error = 0
 
-    def read_img(self, path):
-        self.img = cv2.imread(path)
-        self.imgOrg = cv2.imread(path)
+    def read_img(self, img_path):
+        self.img = cv2.imread(img_path)
+        self.imgOrg = cv2.imread(img_path)
 
     def plate_locate(self):
         self.img = self.__gaussian_blur()
