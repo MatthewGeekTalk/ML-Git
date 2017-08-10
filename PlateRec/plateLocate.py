@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 class CPlateLocate:
@@ -155,8 +154,8 @@ class CPlateLocate:
 
     def img_show(self):
         cv2.imshow('img', self.imgOrg)
-        # for i in range(len(self.plates)):
-        #     cv2.imshow('plates_' + str(i), self.plates[i])
+        for i in range(len(self.plates)):
+            cv2.imshow('plates_' + str(i), self.plates[i])
         cv2.waitKey(0)
 
 
