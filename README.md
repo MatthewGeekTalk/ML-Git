@@ -1,4 +1,4 @@
-# ML-Git
+﻿# ML-Git
 Machine Learning Git
 This repository is for ML Team
 
@@ -16,6 +16,9 @@ http://edu.csdn.net/course/detail/5278
 
 Open CV 视频
 http://edu.csdn.net/course/detail/5510
+
+EaryPR 车牌识别
+https://github.com/liuruoze/EasyPR
 
 Coursera - Machine Learning  - by Andrew Ng
 https://www.coursera.org/learn/machine-learning
