@@ -72,8 +72,6 @@ class CPlateLocate:
             area = cv2.contourArea(cnt)
             if area == 0:
                 continue
-            # epsilon = 0.001 * cv2.arcLength(cnt, True)
-            # approx = cv2.approxPolyDP(cnt, epsilon, True)
             rect = cv2.minAreaRect(cnt)
             box = cv2.boxPoints(rect)
             box = np.int0(box)
