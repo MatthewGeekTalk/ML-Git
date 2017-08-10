@@ -110,8 +110,8 @@ class CPlateLocate:
         rmax = aspect + aspect * error
         area = float(height) * float(width)
         r = float(width) / float(height)
-        # if r < 1:
-        #     r = float(height) / float(width)
+        if r < 1:
+            r = float(height) / float(width)
         if (area < vmin or area > vmax) or (r < rmin or r > rmax):
             return True
         else:
