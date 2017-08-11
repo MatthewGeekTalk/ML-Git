@@ -95,7 +95,6 @@ class SobelPlateLocate:
             region.append(box)
             safe_region.append(safe_box)
         return region, safe_region
-
     # Enlarge Area/Region
     def __enlargeRegion(self):
         src_height, src_width, src_channels = self.imgOrg.shape
@@ -103,16 +102,16 @@ class SobelPlateLocate:
         for box in self.safe_region:
             x = box[0, 0]
             y = box[0, 1]
-            height = abs(box[2, 0] - box[0, 0])
-            width = abs(box[0, 1] - box[1, 1])
+            height = abs(box[2, 0]-box[0, 0])
+            width = abs(box[0, 1]-box[1, 1])
             ratio = width / height
-            if ratio > 1 and ratio < 3 and height < 120:
+            if (ratio > 1 and ratio < 3 and height < 120):
                 box_part = []
                 x_part = int(x - height * (4 - ratio))
-                if x_part < 0:
+                if (x_part < 0):
                     x_part = 0
                 width_part = int(width + height * 2 * (4 - ratio))
-                if width_part + x_part >= src_width:
+                if (width_part + x_part >= src_width):
                     width_part = int(src_width - x_part)
                 y_part = int(y - height * 0.08)
                 height_part = int(height * 1.16)
@@ -130,7 +129,6 @@ class SobelPlateLocate:
                 box_part.append([x3, y3])
                 safe_region_part.append(box_part)
         return safe_region_part
-
     @staticmethod
     def __calc_safe_rect(box):
         box_reshape = np.reshape(box, (box.shape[0], box.shape[1], 1))
@@ -192,8 +190,6 @@ class SobelPlateLocate:
         cv2.imshow('img', self.imgOrg)
         for i in range(len(self.plates)):
             cv2.imshow('plates_' + str(i), self.plates[i])
-        for i in range(len(self.safe_region_part)):
-            cv2.imshow('safe_region_' + str(i), self.safe_region_part[i])
         cv2.waitKey(0)
 
 
