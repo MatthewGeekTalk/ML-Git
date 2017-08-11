@@ -78,8 +78,11 @@ class ColorPlateLocate:
 
     def img_show(self):
         cv2.imshow('img', self.imgOrg)
-        # for i in range(len(self.plates)):
-        #     cv2.imshow('plates_' + str(i), self.plates[i])
+        try:
+            for i in range(len(self.plates)):
+                cv2.imshow('plates_' + str(i), self.plates[i])
+        except Exception:
+            pass
         cv2.waitKey(0)
 
     def __set_bgr2hsv(self):
@@ -97,7 +100,7 @@ class ColorPlateLocate:
         for i in range(len(contours)):
             cnt = contours[i]
             area = cv2.contourArea(cnt)
-            if area == 0:
+            if area == 2000:
                 continue
             rect = cv2.minAreaRect(cnt)
             box = cv2.boxPoints(rect)
