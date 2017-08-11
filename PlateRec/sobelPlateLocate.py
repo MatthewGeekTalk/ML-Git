@@ -145,9 +145,8 @@ class SobelPlateLocate:
         rmin = aspect - aspect * error
         rmax = aspect + aspect * error
         area = float(height) * float(width)
-        if self.img.shape[1] > self.img.shape[0]:
-            r = float(width) / float(height)
-        else:
+        r = float(width) / float(height)
+        if r < 1:
             r = float(height) / float(width)
         if (area < vmin or area > vmax) or (r < rmin or r > rmax):
             return True
