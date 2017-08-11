@@ -22,7 +22,6 @@ class ColorPlateLocate:
 
         self.img = object
         self.imgOrg = object
-        self.plates = object
 
         self.verify_min = 0
         self.verify_max = 0
@@ -31,6 +30,7 @@ class ColorPlateLocate:
 
         self.region = []
         self.safe_region = []
+        self.plates = []
 
     def read_img(self, img_path):
         self.img = cv2.imread(img_path)
