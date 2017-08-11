@@ -100,7 +100,7 @@ class ColorPlateLocate:
         for i in range(len(contours)):
             cnt = contours[i]
             area = cv2.contourArea(cnt)
-            if area == 2000:
+            if area == 0:
                 continue
             rect = cv2.minAreaRect(cnt)
             box = cv2.boxPoints(rect)
