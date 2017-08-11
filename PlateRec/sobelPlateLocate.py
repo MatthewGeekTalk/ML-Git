@@ -13,7 +13,7 @@ class SobelPlateLocate:
         self.morphW = 0
         self.region = []
         self.safe_region = []
-	self.safe_region_part = []
+        self.safe_region_part = []
         self.plates = []
         self.verify_min = 0
         self.verify_max = 0
@@ -31,7 +31,7 @@ class SobelPlateLocate:
         self.img = self.__img_binary()
         self.img = self.__img_morph_close()
         self.region, self.safe_region = self.__find_plate_number_region()
-	self.safe_region_part = self.__enlargeRegion()
+        self.safe_region_part = self.__enlargeRegion()
         self.plates = self.__detect_region()
 
     def set_gaussian_size(self, gaussian_blur_size):
@@ -198,6 +198,7 @@ if __name__ == '__main__':
     path = input('Please input your image path:')
     plate_locate = SobelPlateLocate()
     plate_locate.read_img(path)
+    # plate_locate.read_img('698H8.jpg')
     plate_locate.set_gaussian_size(5)
     plate_locate.set_morph_hw(17, 3)
     plate_locate.set_verify_value(1, 100, 4, .5)
