@@ -106,13 +106,13 @@ class SobelPlateLocate:
             height = abs(box[2, 0] - box[0, 0])
             width = abs(box[0, 1] - box[1, 1])
             ratio = width / height
-            if (ratio > 1 and ratio < 3 and height < 120):
+            if ratio > 1 and ratio < 3 and height < 120:
                 box_part = []
                 x_part = int(x - height * (4 - ratio))
-                if (x_part < 0):
+                if x_part < 0:
                     x_part = 0
                 width_part = int(width + height * 2 * (4 - ratio))
-                if (width_part + x_part >= src_width):
+                if width_part + x_part >= src_width:
                     width_part = int(src_width - x_part)
                 y_part = int(y - height * 0.08)
                 height_part = int(height * 1.16)
