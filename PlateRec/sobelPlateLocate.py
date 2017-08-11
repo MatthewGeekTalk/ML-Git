@@ -190,8 +190,11 @@ class SobelPlateLocate:
 
     def img_show(self):
         cv2.imshow('img', self.imgOrg)
-        for i in range(len(self.plates)):
-            cv2.imshow('plates_' + str(i), self.plates[i])
+        try:
+            for i in range(len(self.plates)):
+                cv2.imshow('plates_' + str(i), self.plates[i])
+        except Exception:
+            pass
         cv2.waitKey(0)
 
 
