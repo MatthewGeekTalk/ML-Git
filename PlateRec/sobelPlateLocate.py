@@ -192,6 +192,8 @@ class SobelPlateLocate:
         cv2.imshow('img', self.imgOrg)
         for i in range(len(self.plates)):
             cv2.imshow('plates_' + str(i), self.plates[i])
+        for i in range(len(self.safe_region_part)):
+            cv2.imshow('safe_region_' + str(i), self.safe_region_part[i])
         cv2.waitKey(0)
 
 
