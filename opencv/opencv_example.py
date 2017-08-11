@@ -21,7 +21,7 @@ while True:
     cv2.imshow("Background", backGround)
     cv2.imshow("ForeGround", foreGround)
     cv2.imshow("Foreground Mask", fgmask)
-    # Hit 'q' on the keyboard to quit!
+    # Hit 'q' on the keyboard to quit?
     k = cv2.waitKey(100) & 0xFF
     if k== 27:
         break
