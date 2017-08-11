@@ -68,7 +68,7 @@ class SobelPlateLocate:
         region = []
         safe_region = []
         img_find = self.img.copy()
-        im2, contours, hierarchy = cv2.findContours(img_find, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        im2, contours, hierarchy = cv2.findContours(img_find, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
         for i in range(len(contours)):
             cnt = contours[i]
             area = cv2.contourArea(cnt)

@@ -63,6 +63,7 @@ class ColorPlateLocate:
             max_h = np.array([self.max_blue, 255, 255])
         self.img = cv2.inRange(self.img, min_h, max_h)
         self.img = self.__img_morph_close()
+        cv2.imshow('img2', self.img)
         self.region, self.safe_region = self.__find_plate_number_region()
         self.plates = self.__detect_region()
 
@@ -96,7 +97,8 @@ class ColorPlateLocate:
         region = []
         safe_region = []
         img_find = self.img.copy()
-        im2, contours, hierarchy = cv2.findContours(img_find, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        im2, contours, hierarchy = cv2.findContours(img_find, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        cv2.imshow('contours', im2)
         for i in range(len(contours)):
             cnt = contours[i]
             area = cv2.contourArea(cnt)
@@ -188,7 +190,7 @@ if __name__ == "__main__":
     plate_locate = ColorPlateLocate('BLUE')
     plate_locate.read_img(path)
     plate_locate.set_img_hsv(255, 64, 95, 100, 140, 15, 40, 0, 30)
-    plate_locate.set_verify_value(1, 100, 4, .5)
+    plate_locate.set_verify_value(1, 200, 4, .5)
     plate_locate.set_morph_hw(17, 3)
     plate_locate.plate_locate()
     plate_locate.img_show()
