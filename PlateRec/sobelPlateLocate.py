@@ -13,7 +13,7 @@ class SobelPlateLocate:
         self.morphW = 0
         self.region = []
         self.safe_region = []
-        self.safe_region = []
+	self.safe_region_part = []
         self.plates = []
         self.verify_min = 0
         self.verify_max = 0
@@ -31,6 +31,7 @@ class SobelPlateLocate:
         self.img = self.__img_binary()
         self.img = self.__img_morph_close()
         self.region, self.safe_region = self.__find_plate_number_region()
+	self.safe_region_part = self.__enlargeRegion()
         self.plates = self.__detect_region()
 
     def set_gaussian_size(self, gaussian_blur_size):
@@ -94,7 +95,40 @@ class SobelPlateLocate:
             region.append(box)
             safe_region.append(safe_box)
         return region, safe_region
-
+    # Enlarge Area/Region
+    def __enlargeRegion(self):
+        src_height, src_width, src_channels = self.imgOrg.shape
+        safe_region_part = []
+        for box in self.safe_region:
+            x = box[0, 0]
+            y = box[0, 1]
+            height = abs(box[2, 0]-box[0, 0])
+            width = abs(box[0, 1]-box[1, 1])
+            ratio = width / height
+            if (ratio > 1 and ratio < 3 and height < 120):
+                box_part = []
+                x_part = int(x - height * (4 - ratio))
+                if (x_part < 0):
+                    x_part = 0
+                width_part = int(width + height * 2 * (4 - ratio))
+                if (width_part + x_part >= src_width):
+                    width_part = int(src_width - x_part)
+                y_part = int(y - height * 0.08)
+                height_part = int(height * 1.16)
+                x0 = x_part
+                y0 = y_part
+                x1 = x_part
+                y1 = y0 - width_part
+                x2 = x0 + height_part
+                y2 = y1
+                x3 = x2
+                y3 = y0
+                box_part.append([x0, y0])
+                box_part.append([x1, y1])
+                box_part.append([x2, y2])
+                box_part.append([x3, y3])
+                safe_region_part.append(box_part)
+        return safe_region_part
     @staticmethod
     def __calc_safe_rect(box):
         box_reshape = np.reshape(box, (box.shape[0], box.shape[1], 1))
