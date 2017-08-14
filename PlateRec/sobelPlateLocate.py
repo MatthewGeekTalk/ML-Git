@@ -13,7 +13,7 @@ class SobelPlateLocate:
         self.morphW = 0
         self.region = []
         self.safe_region = []
-        self.safe_region_part = []
+        self.safe_rect_bound = []
         self.plates = []
         self.verify_min = 0
         self.verify_max = 0
@@ -33,7 +33,6 @@ class SobelPlateLocate:
         self.img = self.__img_binary()
         self.img = self.__img_morph_close()
         self.region, self.safe_region, self.rect, self.safe_rect = self.__find_plate_number_region()
-        self.safe_region_part = self.__enlargeRegion()
         self.plates = self.__detect_region()
 
     def set_gaussian_size(self, gaussian_blur_size):
@@ -104,40 +103,48 @@ class SobelPlateLocate:
             tsafe_rect.append(safe_rect)
         return region, safe_region, trect, tsafe_rect
 
+    @staticmethod
     # Enlarge Area/Region
-    def __enlargeRegion(self):
-        src_height, src_width, src_channels = self.imgOrg.shape
-        safe_region_part = []
-        for box in self.safe_region:
-            x = box[0, 0]
-            y = box[0, 1]
-            height = abs(box[2, 0] - box[0, 0])
-            width = abs(box[0, 1] - box[1, 1])
-            ratio = width / height
-            if ratio > 1 and ratio < 3 and height < 120:
-                box_part = []
-                x_part = int(x - height * (4 - ratio))
-                if x_part < 0:
-                    x_part = 0
-                width_part = int(width + height * 2 * (4 - ratio))
-                if width_part + x_part >= src_width:
-                    width_part = int(src_width - x_part)
-                y_part = int(y - height * 0.08)
-                height_part = int(height * 1.16)
-                x0 = x_part
-                y0 = y_part
-                x1 = x_part
-                y1 = y0 - width_part
-                x2 = x0 + height_part
-                y2 = y1
-                x3 = x2
-                y3 = y0
-                box_part.append([x0, y0])
-                box_part.append([x1, y1])
-                box_part.append([x2, y2])
-                box_part.append([x3, y3])
-                safe_region_part.append(box_part)
-        return safe_region_part
+    def __enlargeRegion(box):
+        top = np.int0(box.shape[0] * 0.3)
+        bottom = np.int0(box.shape[0] * 0.3)
+        left = np.int0(box.shape[1] * 0.3)
+        right = np.int0(box.shape[1] * 0.3)
+        rect_bound = cv2.copyMakeBorder(box, top, bottom, left, right, cv2.BORDER_CONSTANT, value=[255, 255, 255])
+        return rect_bound
+    # def __enlargeRegion(self):
+    #     src_height, src_width, src_channels = self.imgOrg.shape
+    #     safe_region_part = []
+    #     for box in self.safe_region:
+    #         x = box[0, 0]
+    #         y = box[0, 1]
+    #         height = abs(box[2, 0] - box[0, 0])
+    #         width = abs(box[0, 1] - box[1, 1])
+    #         ratio = width / height
+    #         if ratio > 1 and ratio < 3 and height < 120:
+    #             box_part = []
+    #             x_part = int(x - height * (4 - ratio))
+    #             if x_part < 0:
+    #                 x_part = 0
+    #             width_part = int(width + height * 2 * (4 - ratio))
+    #             if width_part + x_part >= src_width:
+    #                 width_part = int(src_width - x_part)
+    #             y_part = int(y - height * 0.08)
+    #             height_part = int(height * 1.16)
+    #             x0 = x_part
+    #             y0 = y_part
+    #             x1 = x_part
+    #             y1 = y0 - width_part
+    #             x2 = x0 + height_part
+    #             y2 = y1
+    #             x3 = x2
+    #             y3 = y0
+    #             box_part.append([x0, y0])
+    #             box_part.append([x1, y1])
+    #             box_part.append([x2, y2])
+    #             box_part.append([x3, y3])
+    #             safe_region_part.append(box_part)
+    #     return safe_region_part
 
     @staticmethod
     def __calc_safe_rect(box):
@@ -180,6 +187,8 @@ class SobelPlateLocate:
             y2 = box[ys_sorted_index[3], 1]
             img_org2 = self.imgOrg.copy()
             img_plate = img_org2[y1:y2, x1:x2]
+            rect_bound = self.__enlargeRegion(img_plate)
+            self.safe_rect_bound.append(rect_bound)
             plates.append(img_plate)
 
         for box in self.region:
