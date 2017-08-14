@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 
+img = object
 img = cv2.imread('C:\\Users\\i072179\\PycharmProjects\\ML-Git\\Material\\plate1.jpg')
 imgOrg = img.copy()
 img = cv2.GaussianBlur(img, (5, 5), 0, 0, cv2.BORDER_DEFAULT)

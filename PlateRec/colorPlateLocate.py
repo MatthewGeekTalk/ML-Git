@@ -30,6 +30,8 @@ class ColorPlateLocate:
 
         self.region = []
         self.safe_region = []
+        self.rect = []
+        self.safe_rect = []
         self.plates = []
 
     def read_img(self, img_path):
@@ -64,7 +66,7 @@ class ColorPlateLocate:
         self.img = cv2.inRange(self.img, min_h, max_h)
         self.img = self.__img_morph_close()
         cv2.imshow('img2', self.img)
-        self.region, self.safe_region = self.__find_plate_number_region()
+        self.region, self.safe_region, self.rect, self.safe_rect = self.__find_plate_number_region()
         self.plates = self.__detect_region()
 
     def set_morph_hw(self, morph_w, morph_h):
@@ -85,6 +87,7 @@ class ColorPlateLocate:
         except Exception:
             pass
         cv2.waitKey(0)
+        # cv2.destroyAllWindows()
 
     def __set_bgr2hsv(self):
         return cv2.cvtColor(self.img, cv2.COLOR_BGR2HSV)
@@ -96,6 +99,8 @@ class ColorPlateLocate:
     def __find_plate_number_region(self):
         region = []
         safe_region = []
+        rect_list = []
+        safe_rect_list = []
         img_find = self.img.copy()
         im2, contours, hierarchy = cv2.findContours(img_find, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
         cv2.imshow('contours', im2)
@@ -113,6 +118,8 @@ class ColorPlateLocate:
                 continue
             if self.__verify_value(height, width):
                 continue
+            if self.__check_angle(rect[1][0], rect[1][1], rect[2]):
+                continue
             err, safe_rect = self.__calc_safe_rect(box)
             if not err:
                 continue
@@ -124,16 +131,27 @@ class ColorPlateLocate:
                 continue
             region.append(box)
             safe_region.append(safe_box)
-        return region, safe_region
+            rect_list.append(rect)
+            safe_rect_list.append(safe_rect)
+        return region, safe_region, rect_list, safe_rect_list
+
+    @staticmethod
+    def __check_angle(width, height, angle):
+        if width / height < 1:
+            angle = angle + 90
+        if angle > 60 or angle < -60:
+            return True
+        else:
+            return False
 
     @staticmethod
     def __calc_safe_rect(box):
         box_reshape = np.reshape(box, (box.shape[0], box.shape[1], 1))
         x, y, w, h = cv2.boundingRect(box_reshape)
-        if w * h != 0:
-            return True, ((x + (w / 2), y + (h / 2)), (w, h), 0)
-        else:
+        if x < 0 or y < 0 or w * h == 0:
             return False, ((x + (w / 2), y + (h / 2)), (w, h), 0)
+        else:
+            return True, ((x + (w / 2), y + (h / 2)), (w, h), 0)
 
     def __verify_value(self, height, width):
         error = self.verify_error
@@ -151,25 +169,33 @@ class ColorPlateLocate:
         else:
             return False
 
+    def __rotate_img(self, rect):
+        M = cv2.getRotationMatrix2D(rect[0], rect[2], 1)
+        img = cv2.warpAffine(self.imgOrg, M, (self.imgOrg.shape[1], self.imgOrg.shape[0]), cv2.INTER_CUBIC)
+        return img
+
     def __detect_region(self):
         plates = []
-        for box in self.safe_region:
-            cv2.drawContours(self.imgOrg, [box], 0, (0, 0, 255), 2)
-            ys = [box[0, 1], box[1, 1], box[2, 1], box[3, 1]]
-            xs = [box[0, 0], box[1, 0], box[2, 0], box[3, 0]]
-            ys_sorted_index = np.argsort(ys)
-            xs_sorted_index = np.argsort(xs)
+        # for box in self.safe_region:
+        #     cv2.drawContours(self.imgOrg, [box], 0, (0, 0, 255), 2)
+        #     ys = [box[0, 1], box[1, 1], box[2, 1], box[3, 1]]
+        #     xs = [box[0, 0], box[1, 0], box[2, 0], box[3, 0]]
+        #     ys_sorted_index = np.argsort(ys)
+        #     xs_sorted_index = np.argsort(xs)
+        #
+        #     x1 = box[xs_sorted_index[0], 0]
+        #     x2 = box[xs_sorted_index[3], 0]
+        #
+        #     y1 = box[ys_sorted_index[0], 1]
+        #     y2 = box[ys_sorted_index[3], 1]
+        #     img_org2 = self.imgOrg.copy()
+        #     img_plate = img_org2[y1:y2, x1:x2]
+        #     plates.append(img_plate)
 
-            x1 = box[xs_sorted_index[0], 0]
-            x2 = box[xs_sorted_index[3], 0]
-
-            y1 = box[ys_sorted_index[0], 1]
-            y2 = box[ys_sorted_index[3], 1]
-            img_org2 = self.imgOrg.copy()
-            img_plate = img_org2[y1:y2, x1:x2]
-            plates.append(img_plate)
-
-        for box in self.region:
+        for rect in self.rect:
+            img = self.__rotate_img(rect)
+            box = cv2.boxPoints(rect)
+            box = np.int0(box)
             cv2.drawContours(self.imgOrg, [box], 0, (0, 255, 0), 2)
             ys = [box[0, 1], box[1, 1], box[2, 1], box[3, 1]]
             xs = [box[0, 0], box[1, 0], box[2, 0], box[3, 0]]
@@ -181,14 +207,14 @@ class ColorPlateLocate:
 
             y1 = box[ys_sorted_index[0], 1]
             y2 = box[ys_sorted_index[3], 1]
-            img_org2 = self.imgOrg.copy()
-            img_plate = img_org2[y1:y2, x1:x2]
+            # img_org2 = self.imgOrg.copy()
+            img_plate = img[y1:y2, x1:x2]
             plates.append(img_plate)
         return plates
 
 
 if __name__ == "__main__":
-    print("Image path: %s" % str(os.path.abspath('../Material')).replace('\\', '\\\\'))
+    print("Image path: %s" % str(os.path.abspath('../Material') + os.path.sep).replace('\\', '\\\\'))
     path = input("Please input your image path:")
     plate_locate = ColorPlateLocate('BLUE')
     plate_locate.read_img(path)
