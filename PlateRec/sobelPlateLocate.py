@@ -153,7 +153,7 @@ class SobelPlateLocate:
     def __calc_safe_rect(box):
         box_reshape = np.reshape(box, (box.shape[0], box.shape[1], 1))
         x, y, w, h = cv2.boundingRect(box_reshape)
-        if w < 0 or h < 0 or w < h :
+        if w < 0 or h < 0 or w < h:
             return False, ((x + (w / 2), y + (h / 2)), (w, h), 0)
         else:
             return True, ((x + (w / 2), y + (h / 2)), (w, h), 0)
