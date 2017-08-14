@@ -19,6 +19,8 @@ class SobelPlateLocate:
         self.verify_max = 0
         self.verify_aspect = 0
         self.verify_error = 0
+        self.rect = []
+        self.safe_rect = []
 
     def read_img(self, img_path):
         self.img = cv2.imread(img_path)
@@ -30,7 +32,7 @@ class SobelPlateLocate:
         self.img = self.__img_sobel()
         self.img = self.__img_binary()
         self.img = self.__img_morph_close()
-        self.region, self.safe_region = self.__find_plate_number_region()
+        self.region, self.safe_region, self.rect, self.safe_rect = self.__find_plate_number_region()
         self.safe_region_part = self.__enlargeRegion()
         self.plates = self.__detect_region()
 
@@ -67,6 +69,8 @@ class SobelPlateLocate:
     def __find_plate_number_region(self):
         region = []
         safe_region = []
+        trect = []
+        tsafe_rect = []
         img_find = self.img.copy()
         im2, contours, hierarchy = cv2.findContours(img_find, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
         for i in range(len(contours)):
@@ -92,9 +96,13 @@ class SobelPlateLocate:
             safe_width = abs(safe_box[0][0] - safe_box[2][0])
             if self.__verify_value(safe_height, safe_width):
                 continue
-            region.append(box)
-            safe_region.append(safe_box)
-        return region, safe_region
+            if (rect[2] <= -5 or rect[2] >= 5):
+                safe_region.append(safe_box)
+            else:
+                region.append(box)
+            trect.append(rect)
+            tsafe_rect.append(safe_rect)
+        return region, safe_region, trect, tsafe_rect
 
     # Enlarge Area/Region
     def __enlargeRegion(self):
@@ -206,7 +214,7 @@ if __name__ == '__main__':
     path = input('Please input your image path:')
     plate_locate = SobelPlateLocate()
     plate_locate.read_img(path)
-    # plate_locate.read_img('698H8.jpg')
+    # plate_locate.read_img('plate2.jpg')
     plate_locate.set_gaussian_size(5)
     plate_locate.set_morph_hw(17, 3)
     plate_locate.set_verify_value(1, 100, 4, .5)
