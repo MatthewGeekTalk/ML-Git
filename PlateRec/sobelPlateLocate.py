@@ -102,7 +102,9 @@ class SobelPlateLocate:
             trect.append(rect)
             tsafe_rect.append(safe_rect)
         return region, safe_region, trect, tsafe_rect
-
+    # Deskew plate
+    # def __deskew(self):
+    #     return self
     @staticmethod
     # Enlarge Area/Region
     def __enlargeRegion(box):
@@ -189,7 +191,7 @@ class SobelPlateLocate:
             img_plate = img_org2[y1:y2, x1:x2]
             rect_bound = self.__enlargeRegion(img_plate)
             self.safe_rect_bound.append(rect_bound)
-            plates.append(img_plate)
+            plates.append(rect_bound)
 
         for box in self.region:
             cv2.drawContours(self.imgOrg, [box], 0, (0, 255, 0), 2)
