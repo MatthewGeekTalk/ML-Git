@@ -130,7 +130,10 @@ class ColorPlateLocate:
     def __calc_safe_rect(box):
         box_reshape = np.reshape(box, (box.shape[0], box.shape[1], 1))
         x, y, w, h = cv2.boundingRect(box_reshape)
-        return True, ((x + (w / 2), y + (h / 2)), (w, h), 0)
+        if w * h != 0:
+            return True, ((x + (w / 2), y + (h / 2)), (w, h), 0)
+        else:
+            return False, ((x + (w / 2), y + (h / 2)), (w, h), 0)
 
     def __verify_value(self, height, width):
         error = self.verify_error
