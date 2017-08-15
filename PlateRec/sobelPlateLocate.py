@@ -6,33 +6,34 @@ import os
 class SobelPlateLocate:
     def __init__(self):
         self.m_GaussianBlurSize = 0.
+        self.m_angle = 60
         self.img = object
         self.imgOrg = object
         self.im2 = object
         self.morphH = 0
         self.morphW = 0
         self.region = []
-        self.safe_region = []
-        self.safe_rect_bound = []
+        # self.safe_region = []
+        # self.safe_rect_bound = []
         self.plates = []
         self.verify_min = 0
         self.verify_max = 0
         self.verify_aspect = 0
         self.verify_error = 0
         self.rect = []
-        self.safe_rect = []
+        self.angle = []
 
     def read_img(self, img_path):
         self.img = cv2.imread(img_path)
         self.imgOrg = cv2.imread(img_path)
 
     def plate_locate(self):
-        self.img = self.__gaussian_blur()
-        self.img = self.__img_gray()
-        self.img = self.__img_sobel()
-        self.img = self.__img_binary()
-        self.img = self.__img_morph_close()
-        self.region, self.safe_region, self.rect = self.__find_plate_number_region()
+        self.img = self.__gaussian_blur(self.img, self.m_GaussianBlurSize)
+        self.img = self.__img_gray(self.img)
+        self.img = self.__img_sobel(self.img)
+        self.img = self.__img_binary(self.img)
+        self.img = self.__img_morph_close(self.img,self.morphW, self.morphH)
+        self.region, self.angle = self.__find_plate_number_region()
         self.plates = self.__detect_region()
 
     def set_gaussian_size(self, gaussian_blur_size):
@@ -49,29 +50,37 @@ class SobelPlateLocate:
         self.verify_error = verify_error
 
     def __sobelOper(self, m_GaussianBlurSize, morph_w, morph_h):
+        img_opr = self.imgOrg.copy()
+        img_opr = cv2.GaussianBlur(self.img, (m_GaussianBlurSize, m_GaussianBlurSize), 0, 0, cv2.BORDER_DEFAULT)
+        if img_opr[2] == 3:
+            img_opr = cv2.cvtColor(img_opr, cv2.COLOR_BGR2GRAY)
+        img_opr = self.__img_sobel(img_opr)
+        img_opr = self.__img_binary(img_opr)
+        img_opr = self.__img_morph_close(img_opr, morph_w, morph_h)
+        return img_opr
+    def __gaussian_blur(self, img, m_GaussianBlurSize):
+        return cv2.GaussianBlur(img, (m_GaussianBlurSize, m_GaussianBlurSize), 0, 0, cv2.BORDER_DEFAULT)
 
-        return 0
-    def __gaussian_blur(self):
-        return cv2.GaussianBlur(self.img, (self.m_GaussianBlurSize, self.m_GaussianBlurSize), 0, 0, cv2.BORDER_DEFAULT)
+    def __img_gray(self, img):
+        return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    def __img_gray(self):
-        return cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
+    def __img_sobel(self, img):
+        img = cv2.Sobel(img, cv2.CV_8U, 1, 0, ksize=3)
+        img = cv2.convertScaleAbs(img)
+        return cv2.addWeighted(img, 1, 0, 0, 0)
 
-    def __img_sobel(self):
-        return cv2.Sobel(self.img, cv2.CV_8U, 1, 0, ksize=3)
-
-    def __img_binary(self):
-        ret, binary = cv2.threshold(self.img, 0, 255, cv2.THRESH_OTSU + cv2.THRESH_BINARY)
+    def __img_binary(self, img):
+        ret, binary = cv2.threshold(img, 0, 255, cv2.THRESH_OTSU + cv2.THRESH_BINARY)
         return binary
 
-    def __img_morph_close(self):
-        element = cv2.getStructuringElement(cv2.MORPH_RECT, (self.morphW, self.morphH))
-        return cv2.morphologyEx(self.img, cv2.MORPH_CLOSE, element)
+    def __img_morph_close(self, img, morphW, morphH):
+        element = cv2.getStructuringElement(cv2.MORPH_RECT, (morphW, morphH))
+        return cv2.morphologyEx(img, cv2.MORPH_CLOSE, element)
 
     def __find_plate_number_region(self):
         region = []
         safe_region = []
-        trect = []
+        angle = []
         img_find = self.img.copy()
         im2, contours, hierarchy = cv2.findContours(img_find, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
         for i in range(len(contours)):
@@ -97,12 +106,9 @@ class SobelPlateLocate:
             safe_width = abs(safe_box[0][0] - safe_box[2][0])
             if self.__verify_value(safe_height, safe_width):
                 continue
-            if (rect[2] <= -5 or rect[2] >= 5):# Check angle
-                safe_region.append(safe_box)
-            else:
-                region.append(box)
-            trect.append(rect)
-        return region, safe_region, trect
+            region.append(safe_box)
+            angle.append(rect[2])
+        return region, angle
     # Deskew plate
     # def __deskew(self):
     #     return self
@@ -176,24 +182,25 @@ class SobelPlateLocate:
 
     def __detect_region(self):
         plates = []
-        for box in self.safe_region:
-            cv2.drawContours(self.imgOrg, [box], 0, (0, 0, 255), 2)
-            ys = [box[0, 1], box[1, 1], box[2, 1], box[3, 1]]
-            xs = [box[0, 0], box[1, 0], box[2, 0], box[3, 0]]
-            ys_sorted_index = np.argsort(ys)
-            xs_sorted_index = np.argsort(xs)
-
-            x1 = box[xs_sorted_index[0], 0]
-            x2 = box[xs_sorted_index[3], 0]
-
-            y1 = box[ys_sorted_index[0], 1]
-            y2 = box[ys_sorted_index[3], 1]
-            img_org2 = self.imgOrg.copy()
-            img_plate = img_org2[y1:y2, x1:x2]
-            print(img_plate.shape)
-            img_large = self.__enlargeRegion(img_plate)
-            self.safe_rect_bound.append(img_large)
-            plates.append(img_large)
+        i = 0
+        # for box in self.safe_region:
+        #     cv2.drawContours(self.imgOrg, [box], 0, (0, 0, 255), 2)
+        #     ys = [box[0, 1], box[1, 1], box[2, 1], box[3, 1]]
+        #     xs = [box[0, 0], box[1, 0], box[2, 0], box[3, 0]]
+        #     ys_sorted_index = np.argsort(ys)
+        #     xs_sorted_index = np.argsort(xs)
+        #
+        #     x1 = box[xs_sorted_index[0], 0]
+        #     x2 = box[xs_sorted_index[3], 0]
+        #
+        #     y1 = box[ys_sorted_index[0], 1]
+        #     y2 = box[ys_sorted_index[3], 1]
+        #     img_org2 = self.imgOrg.copy()
+        #     img_plate = img_org2[y1:y2, x1:x2]
+        #     print(img_plate.shape)
+        #     img_large = self.__enlargeRegion(img_plate)
+        #     self.safe_rect_bound.append(img_large)
+        #     plates.append(img_large)
 
         for box in self.region:
             cv2.drawContours(self.imgOrg, [box], 0, (0, 255, 0), 2)
@@ -209,7 +216,10 @@ class SobelPlateLocate:
             y2 = box[ys_sorted_index[3], 1]
             img_org2 = self.imgOrg.copy()
             img_plate = img_org2[y1:y2, x1:x2]
+            if (-5 >= self.angle[i] or self.angle[i] >= 5):
+                img_plate = self.__enlargeRegion(img_plate)
             plates.append(img_plate)
+            i = i + 1
         return plates
 
     def img_show(self):
