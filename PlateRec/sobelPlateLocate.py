@@ -13,8 +13,6 @@ class SobelPlateLocate:
         self.morphH = 0
         self.morphW = 0
         self.region = []
-        # self.safe_region = []
-        # self.safe_rect_bound = []
         self.plates = []
         self.verify_min = 0
         self.verify_max = 0
@@ -35,6 +33,7 @@ class SobelPlateLocate:
         self.img = self.__img_morph_close(self.img,self.morphW, self.morphH)
         self.region, self.angle = self.__find_plate_number_region()
         self.plates = self.__detect_region()
+        img_opr = self.__sobelOper(3, 10, 3)
 
     def set_gaussian_size(self, gaussian_blur_size):
         self.m_GaussianBlurSize = gaussian_blur_size
@@ -51,8 +50,8 @@ class SobelPlateLocate:
 
     def __sobelOper(self, m_GaussianBlurSize, morph_w, morph_h):
         img_opr = self.imgOrg.copy()
-        img_opr = cv2.GaussianBlur(self.img, (m_GaussianBlurSize, m_GaussianBlurSize), 0, 0, cv2.BORDER_DEFAULT)
-        if img_opr[2] == 3:
+        img_opr = cv2.GaussianBlur(img_opr, (m_GaussianBlurSize, m_GaussianBlurSize), 0, 0, cv2.BORDER_DEFAULT)
+        if img_opr.shape[2] == 3:
             img_opr = cv2.cvtColor(img_opr, cv2.COLOR_BGR2GRAY)
         img_opr = self.__img_sobel(img_opr)
         img_opr = self.__img_binary(img_opr)
@@ -79,7 +78,6 @@ class SobelPlateLocate:
 
     def __find_plate_number_region(self):
         region = []
-        safe_region = []
         angle = []
         img_find = self.img.copy()
         im2, contours, hierarchy = cv2.findContours(img_find, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
@@ -107,11 +105,17 @@ class SobelPlateLocate:
             if self.__verify_value(safe_height, safe_width):
                 continue
             region.append(safe_box)
-            angle.append(rect[2])
+            if height > width :
+                angle1 = rect[2] + 90
+            else:
+                angle1 = abs(rect[2])
+            center_angle = [safe_rect[0][0], safe_rect[0][1], angle1]
+            angle.append(center_angle)
         return region, angle
     # Deskew plate
-    # def __deskew(self):
-    #     return self
+    def __deskew(self, src, srcb, plates, angle):
+        img_opr = src.copy()
+        return self
     @staticmethod
     # Enlarge Area/Region
     def __enlargeRegion(box):
@@ -201,7 +205,6 @@ class SobelPlateLocate:
         #     img_large = self.__enlargeRegion(img_plate)
         #     self.safe_rect_bound.append(img_large)
         #     plates.append(img_large)
-
         for box in self.region:
             cv2.drawContours(self.imgOrg, [box], 0, (0, 255, 0), 2)
             ys = [box[0, 1], box[1, 1], box[2, 1], box[3, 1]]
@@ -216,8 +219,12 @@ class SobelPlateLocate:
             y2 = box[ys_sorted_index[3], 1]
             img_org2 = self.imgOrg.copy()
             img_plate = img_org2[y1:y2, x1:x2]
-            if (-5 >= self.angle[i] or self.angle[i] >= 5):
+            if (5 <= self.angle[i][2]):
+                #增大图片边缘pedding
                 img_plate = self.__enlargeRegion(img_plate)
+                #角度大于5度的，首先需要旋转
+                M = cv2.getRotationMatrix2D((img_plate.shape[1]/2, img_plate.shape[0]/2), self.angle[i][2], 1)
+                img_plate = cv2.warpAffine(img_plate, M, (img_plate.shape[1], img_plate.shape[0]), cv2.INTER_CUBIC)
             plates.append(img_plate)
             i = i + 1
         return plates
