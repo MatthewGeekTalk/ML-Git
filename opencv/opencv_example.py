@@ -24,6 +24,6 @@ while True:
     # Hit 'q' on the keyboard to quit?
     k = cv2.waitKey(100) & 0xFF
     if k== 27:
-        break
+        break  # test
 video_capture.release()
 cv2.destroyAllWindows()
