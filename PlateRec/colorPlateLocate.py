@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import os
+import math
 
 
 class ColorPlateLocate:
@@ -124,11 +125,49 @@ class ColorPlateLocate:
 
                 y1 = safe_box[ys_sorted_index[0], 1]
                 y2 = safe_box[ys_sorted_index[3], 1]
-                # bi_plate = img_binary[y1:y2, x1:x2]
-                # bi_plate = bi_plate / 255
+                bi_plate = img_binary[y1:y2, x1:x2]
                 img_plate = img_org[y1:y2, x1:x2]
+                err, slope = self.__isdeflection(bi_plate)
+                if not err:
+                    continue
+                img_plate = self.__affine(img_plate, slope)
                 split_plates.append(img_plate)
         return split_plates
+
+    @staticmethod
+    def __affine(img, slope):
+        ori_tri = [(0, 0), (0, 0), (0, 0)]
+        tar_tri = [(0, 0), (0, 0), (0, 0)]
+        height = img.shape[0]
+        width = img.shape[1]
+        xiff = abs(slope) * height
+        if slope > 0:
+            ori_tri[0] = (xiff, 0)
+            ori_tri[1] = (0, height)
+            ori_tri[2] = (width - xiff, height)
+
+    @staticmethod
+    def __isdeflection(img):
+        height = img.shape[0]
+        width = img.shape[1]
+        comp_index = [int(height / 4), int(height / 4 * 2), int(height / 4 * 3)]
+        len = [0, 0, 0]
+
+        for i in range(0, 2):
+            row = comp_index[i]
+            value = 0
+            j = 0
+            while value == 0 and j < width:
+                value = img[row][j]
+                j += 1
+
+            len[i] = j
+        if len[1] > len[2] and len[1] > len[0]:
+            return False, 0
+        a = len[0] - len[2]
+        b = int(height / 4 * 3) - int(height / 4)
+        slope = b / a
+        return True, slope
 
     @staticmethod
     def __calc_parallelogram(self, img):
@@ -250,7 +289,7 @@ class ColorPlateLocate:
             box = cv2.boxPoints(rect)
             box = np.int0(box)
             # cv2.drawContours(self.imgOrg, [safe_box], 0, (0, 0, 255), 2)
-            cv2.drawContours(self.imgOrg, [box], 0, (0, 255, 0), 2)
+            # cv2.drawContours(self.imgOrg, [box], 0, (0, 255, 0), 2)
             ys = [safe_box[0, 1], safe_box[1, 1], safe_box[2, 1], safe_box[3, 1]]
             xs = [safe_box[0, 0], safe_box[1, 0], safe_box[2, 0], safe_box[3, 0]]
             ys_sorted_index = np.argsort(ys)
@@ -265,6 +304,7 @@ class ColorPlateLocate:
 
             img_plate = self.__enlarge_region(img_plate)
             img_plate = self.__rotate_img(rect, img_plate)
+
             plates.append(img_plate)
         return plates
 
