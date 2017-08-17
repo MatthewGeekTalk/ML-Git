@@ -146,6 +146,10 @@ class ColorPlateLocate:
             ori_tri[1] = (0, height)
             ori_tri[2] = (width - xiff, height)
 
+            tar_tri[0] = (0, 0)
+            tar_tri[1] = (0, height)
+            tar_tri[2] = (width, height)
+
     @staticmethod
     def __isdeflection(img):
         height = img.shape[0]
