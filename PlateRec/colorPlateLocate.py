@@ -126,7 +126,7 @@ class ColorPlateLocate:
                 y1 = safe_box[ys_sorted_index[0], 1]
                 y2 = safe_box[ys_sorted_index[3], 1]
                 bi_plate = img_binary[y1:y2, x1:x2]
-                cv2.imshow('bi' + str(i), bi_plate)
+                # cv2.imshow('bi' + str(i), bi_plate)
                 img_plate = img_org[y1:y2, x1:x2]
                 is_plate, slope = self.__isdeflection(bi_plate)
                 if is_plate:
@@ -308,7 +308,7 @@ class ColorPlateLocate:
             box = cv2.boxPoints(rect)
             box = np.int0(box)
             # cv2.drawContours(self.imgOrg, [safe_box], 0, (0, 0, 255), 2)
-            cv2.drawContours(self.imgOrg, [box], 0, (0, 255, 0), 2)
+            # cv2.drawContours(self.imgOrg, [box], 0, (0, 255, 0), 2)
             ys = [safe_box[0, 1], safe_box[1, 1], safe_box[2, 1], safe_box[3, 1]]
             xs = [safe_box[0, 0], safe_box[1, 0], safe_box[2, 0], safe_box[3, 0]]
             ys_sorted_index = np.argsort(ys)
