@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import math
 import os
 
 
@@ -10,6 +11,7 @@ class SobelPlateLocate:
         self.img = object
         self.imgOrg = object
         self.im2 = object
+        self.img_opr = object
         self.morphH = 0
         self.morphW = 0
         self.region = []
@@ -32,8 +34,8 @@ class SobelPlateLocate:
         self.img = self.__img_binary(self.img)
         self.img = self.__img_morph_close(self.img,self.morphW, self.morphH)
         self.region, self.angle = self.__find_plate_number_region()
+        # self.img_opr = self.__sobelOper(self.img_opr, 3, 10, 3)
         self.plates = self.__detect_region()
-        img_opr = self.__sobelOper(3, 10, 3)
 
     def set_gaussian_size(self, gaussian_blur_size):
         self.m_GaussianBlurSize = gaussian_blur_size
@@ -48,8 +50,8 @@ class SobelPlateLocate:
         self.verify_aspect = verify_aspect
         self.verify_error = verify_error
 
-    def __sobelOper(self, m_GaussianBlurSize, morph_w, morph_h):
-        img_opr = self.imgOrg.copy()
+    def __sobelOper(self, src, m_GaussianBlurSize, morph_w, morph_h):
+        img_opr = src.copy()
         img_opr = cv2.GaussianBlur(img_opr, (m_GaussianBlurSize, m_GaussianBlurSize), 0, 0, cv2.BORDER_DEFAULT)
         if img_opr.shape[2] == 3:
             img_opr = cv2.cvtColor(img_opr, cv2.COLOR_BGR2GRAY)
@@ -108,57 +110,106 @@ class SobelPlateLocate:
             if height > width :
                 angle1 = rect[2] + 90
             else:
-                angle1 = abs(rect[2])
+                angle1 = rect[2]
             center_angle = [safe_rect[0][0], safe_rect[0][1], angle1]
             angle.append(center_angle)
         return region, angle
-    # Deskew plate
-    def __deskew(self, src, srcb, plates, angle):
+    #Enlarge and Rotation
+    def __enlarge_rotation(self, src, angle):
         img_opr = src.copy()
-        return self
+        # 增大图片边缘pedding
+        size_original = (src.shape[1], src.shape[0])
+        img_opr = self.__enlargeRegion(src)
+        # 角度大于5度的，首先需要旋转
+        size_enlarge = (img_opr.shape[1], img_opr.shape[0])
+        center = (img_opr.shape[1] / 2, img_opr.shape[0] / 2)
+        M = cv2.getRotationMatrix2D(center, angle, 1)
+        img_opr = cv2.warpAffine(img_opr, M, size_enlarge, cv2.INTER_CUBIC)
+        # 剪裁
+        img_opr = cv2.getRectSubPix(img_opr, size_original, center)
+        return img_opr
+    # Deskew plate
+    def __deskew(self, src, angle, src_sc):
+        img_opr = self.__enlarge_rotation(src, angle)
+        img_opr_sc = self.__enlarge_rotation(src_sc, angle)
+        slope = 0
+        err, slope = self.__isdeflection(img_opr, angle, slope)
+        if (err):
+            img_opr = self.__affine(img_opr_sc, slope)
+        else:
+            img_opr = img_opr_sc
+            print("Affine is not needed")
+        return img_opr
+    #仿射变换
+    def __affine(self,src, slope):
+        dstTri = [(0, 0), (0, 0), (0, 0)]
+        plTri = [(0, 0), (0, 0), (0, 0)]
+        height = src.shape[0]
+        width = src.shape[1]
+        xiff = abs(slope) * height
+        if slope > 0:
+            #right, new position is xiff/2
+            plTri[0] = (0, 0)
+            plTri[1] = (width - xiff - 1, 0)
+            plTri[2] = (0 + xiff, height - 1)
+
+            dstTri[0] = (xiff / 2, 0)
+            dstTri[1] = (width - 1 - xiff / 2, 0)
+            dstTri[2] = (xiff / 2, height - 1)
+        else:
+            #left, new position is -xiff/2
+            plTri[0] = (0 + xiff, 0)
+            plTri[1] = (width - 1, 0)
+            plTri[2] = (0, height - 1)
+
+            dstTri[0] = (xiff / 2, 0)
+            dstTri[1] = (width - 1 - xiff + xiff / 2, 0)
+            dstTri[2] = (xiff / 2, height - 1)
+        M = cv2.getAffineTransform(np.float32(plTri), np.float32(dstTri))
+        if (height > 36 or width > 136):
+            dst = cv2.warpAffine(src, M, (width, height), cv2.INTER_AREA)
+        else:
+            dst = cv2.warpAffine(src, M, (width, height), cv2.INTER_CUBIC)
+        return dst
+    # Check plate if need affine
+    def __isdeflection(self, src, angle, slope):
+        height = src.shape[0]
+        width = src.shape[1]
+        comp_index = [int(height / 4), int(height / 4 * 2), int(height / 4 * 3)]
+        len = [0, 0, 0]
+
+        for i in range(0, 2):
+            row = comp_index[i]
+            value = 0
+            j = 0
+            while (0 == value and j < width):
+                value = src[row][j]
+                j = j + 1
+            len[i] = j
+
+        maxlen = max(len[2], len[0])
+        minlen = min(len[2], len[0])
+        difflen = abs(len[2] - len[0])
+        PI = 3.14159265
+        g = math.tan(angle * PI / 180.0)
+        if (maxlen - len[1] > width / 32 or len[1] - minlen > width / 32):
+            slope_can_1 = (len[2] - len[0]) / comp_index[1]
+            slope_can_2 = (len[1] - len[0]) / (comp_index[0])
+            slope_can_3 = (len[2] - len[1]) / (comp_index[0])
+            slope = slope_can_1 if abs(slope_can_1 - g) <= abs(slope_can_2 - g) else slope_can_2
+            return True, slope
+        else:
+            slope = 0
+        return False, slope
     @staticmethod
     # Enlarge Area/Region
     def __enlargeRegion(box):
-        top = np.int0(box.shape[0] * 0.3)
-        bottom = np.int0(box.shape[0] * 0.3)
-        left = np.int0(box.shape[1] * 0.3)
-        right = np.int0(box.shape[1] * 0.3)
+        top = np.int0(box.shape[0] * 0.1)
+        bottom = np.int0(box.shape[0] * 0.1)
+        left = np.int0(box.shape[1] * 0.1)
+        right = np.int0(box.shape[1] * 0.1)
         rect_bound = cv2.copyMakeBorder(box, top, bottom, left, right, cv2.BORDER_CONSTANT, value=[255, 255, 255])
         return rect_bound
-    # def __enlargeRegion(self):
-    #     src_height, src_width, src_channels = self.imgOrg.shape
-    #     safe_region_part = []
-    #     for box in self.safe_region:
-    #         x = box[0, 0]
-    #         y = box[0, 1]
-    #         height = abs(box[2, 0] - box[0, 0])
-    #         width = abs(box[0, 1] - box[1, 1])
-    #         ratio = width / height
-    #         if ratio > 1 and ratio < 3 and height < 120:
-    #             box_part = []
-    #             x_part = int(x - height * (4 - ratio))
-    #             if x_part < 0:
-    #                 x_part = 0
-    #             width_part = int(width + height * 2 * (4 - ratio))
-    #             if width_part + x_part >= src_width:
-    #                 width_part = int(src_width - x_part)
-    #             y_part = int(y - height * 0.08)
-    #             height_part = int(height * 1.16)
-    #             x0 = x_part
-    #             y0 = y_part
-    #             x1 = x_part
-    #             y1 = y0 - width_part
-    #             x2 = x0 + height_part
-    #             y2 = y1
-    #             x3 = x2
-    #             y3 = y0
-    #             box_part.append([x0, y0])
-    #             box_part.append([x1, y1])
-    #             box_part.append([x2, y2])
-    #             box_part.append([x3, y3])
-    #             safe_region_part.append(box_part)
-    #     return safe_region_part
-
     @staticmethod
     def __calc_safe_rect(box):
         box_reshape = np.reshape(box, (box.shape[0], box.shape[1], 1))
@@ -187,24 +238,6 @@ class SobelPlateLocate:
     def __detect_region(self):
         plates = []
         i = 0
-        # for box in self.safe_region:
-        #     cv2.drawContours(self.imgOrg, [box], 0, (0, 0, 255), 2)
-        #     ys = [box[0, 1], box[1, 1], box[2, 1], box[3, 1]]
-        #     xs = [box[0, 0], box[1, 0], box[2, 0], box[3, 0]]
-        #     ys_sorted_index = np.argsort(ys)
-        #     xs_sorted_index = np.argsort(xs)
-        #
-        #     x1 = box[xs_sorted_index[0], 0]
-        #     x2 = box[xs_sorted_index[3], 0]
-        #
-        #     y1 = box[ys_sorted_index[0], 1]
-        #     y2 = box[ys_sorted_index[3], 1]
-        #     img_org2 = self.imgOrg.copy()
-        #     img_plate = img_org2[y1:y2, x1:x2]
-        #     print(img_plate.shape)
-        #     img_large = self.__enlargeRegion(img_plate)
-        #     self.safe_rect_bound.append(img_large)
-        #     plates.append(img_large)
         for box in self.region:
             cv2.drawContours(self.imgOrg, [box], 0, (0, 255, 0), 2)
             ys = [box[0, 1], box[1, 1], box[2, 1], box[3, 1]]
@@ -217,15 +250,14 @@ class SobelPlateLocate:
 
             y1 = box[ys_sorted_index[0], 1]
             y2 = box[ys_sorted_index[3], 1]
-            img_org2 = self.imgOrg.copy()
-            img_plate = img_org2[y1:y2, x1:x2]
-            if (5 <= self.angle[i][2]):
-                #增大图片边缘pedding
-                img_plate = self.__enlargeRegion(img_plate)
-                #角度大于5度的，首先需要旋转
-                M = cv2.getRotationMatrix2D((img_plate.shape[1]/2, img_plate.shape[0]/2), self.angle[i][2], 1)
-                img_plate = cv2.warpAffine(img_plate, M, (img_plate.shape[1], img_plate.shape[0]), cv2.INTER_CUBIC)
-            plates.append(img_plate)
+            img_org = self.img.copy()
+            img_org_orginal = self.imgOrg.copy()
+            img_plate = img_org[y1:y2, x1:x2]
+            img_plate_sc = img_org_orginal[y1:y2, x1:x2]
+            # img_plate_bound = self.__sobelOper(img_plate_sc, 3, 6, 2)
+            if (self.angle[i][2] < -5 or self.angle[i][2] > 5):
+                img_plate_sc = self.__deskew(img_plate, self.angle[i][2], img_plate_sc)
+            plates.append(img_plate_sc)
             i = i + 1
         return plates
 
