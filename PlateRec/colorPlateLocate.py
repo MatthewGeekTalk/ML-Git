@@ -196,7 +196,7 @@ class ColorPlateLocate:
         b = int(height / 4 * 3) - int(height / 4)
         slope = a / b
         # remove the degree is very small
-        if slope < 0.25:
+        if slope < 0.1:
             return False, 0
         return True, slope
 
