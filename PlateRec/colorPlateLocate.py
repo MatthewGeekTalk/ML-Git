@@ -5,7 +5,7 @@ import math
 
 
 class ColorPlateLocate:
-    def __init__(self, plate_case):
+    def __init__(self):
         self.max_sv = 0
         self.minref_sv = 0
         self.minabs_sv = 0
@@ -192,6 +192,9 @@ class ColorPlateLocate:
     def __calc_parallelogram(self, img):
         print(img)
 
+    def return_plates(self):
+        return self.plates
+
     def set_verify_value(self, verify_min, verify_max, verify_aspect, verify_error):
         self.verify_min = verify_min
         self.verify_max = verify_max
@@ -340,7 +343,7 @@ class ColorPlateLocate:
 if __name__ == "__main__":
     print("Image path: %s" % str(os.path.abspath('../Material') + os.path.sep).replace('\\', '\\\\'))
     path = input("Please input your image path:")
-    plate_locate = ColorPlateLocate('BLUE')
+    plate_locate = ColorPlateLocate()
     my_img = plate_locate.read_img(path)
     plate_locate.set_img_hsv(255, 64, 95, 100, 140, 15, 40, 0, 30)
     plate_locate.set_verify_value(1, 200, 4, .5)
