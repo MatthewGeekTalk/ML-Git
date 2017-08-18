@@ -198,7 +198,7 @@ class ColorPlateLocate:
         return True, slope
 
     @staticmethod
-    def __calc_parallelogram(self, img):
+    def __calc_parallelogram(img):
         print(img)
 
     def __resize_plates(self, img):
