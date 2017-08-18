@@ -35,6 +35,13 @@ class ColorPlateLocate:
         self.safe_rect = []
         self.plates = []
 
+        self.height = 0
+        self.width = 0
+
+    def set_size(self, height, width):
+        self.height = height
+        self.width = width
+
     def read_img(self, img_path):
         self.img = cv2.imread(img_path)
         self.imgOrg = self.img.copy()
@@ -81,7 +88,11 @@ class ColorPlateLocate:
         region = self.__find_plate_number_region(img)
         plates = self.__detect_region(region, self.imgOrg)
         plates = self.__split_plate(plates, case)
-        self.plates = plates
+
+        # resize plates for CNN
+        for plate in plates:
+            plate = self.__resize_plates(plate)
+            self.plates.append(plate)
 
     def set_morph_hw(self, morph_w, morph_h):
         self.morphW = morph_w
@@ -139,8 +150,7 @@ class ColorPlateLocate:
     def __affine(img, slope):
         ori_tri = [(0, 0), (0, 0), (0, 0)]
         tar_tri = [(0, 0), (0, 0), (0, 0)]
-        height = img.shape[0]
-        width = img.shape[1]
+        height, width = img.shape[:2]
         xiff = abs(slope) * height
         if slope > 0:
             ori_tri[0] = (xiff, 0)
@@ -168,8 +178,7 @@ class ColorPlateLocate:
 
     @staticmethod
     def __isdeflection(img):
-        height = img.shape[0]
-        width = img.shape[1]
+        height, width = img.shape[:2]
         comp_index = [int(height / 4), int(height / 4 * 2), int(height / 4 * 3)]
         len = [0, 0, 0]
 
@@ -186,11 +195,17 @@ class ColorPlateLocate:
         a = len[0] - len[2]
         b = int(height / 4 * 3) - int(height / 4)
         slope = a / b
+        # remove the degree is very small
+        if slope < 0.25:
+            return False, 0
         return True, slope
 
     @staticmethod
     def __calc_parallelogram(self, img):
         print(img)
+
+    def __resize_plates(self, img):
+        return cv2.resize(img, (self.width, self.height), interpolation=cv2.INTER_CUBIC)
 
     def return_plates(self):
         return self.plates
@@ -209,6 +224,7 @@ class ColorPlateLocate:
         except Exception:
             pass
         cv2.waitKey(0)
+        cv2.destroyAllWindows()
         # cv2.destroyAllWindows()
 
     @staticmethod
@@ -341,12 +357,19 @@ class ColorPlateLocate:
 
 
 if __name__ == "__main__":
+    temp_plates = []
+
     print("Image path: %s" % str(os.path.abspath('../Material') + os.path.sep).replace('\\', '\\\\'))
     path = input("Please input your image path:")
     plate_locate = ColorPlateLocate()
     my_img = plate_locate.read_img(path)
+    plate_locate.set_size(20, 72)
     plate_locate.set_img_hsv(255, 64, 95, 100, 140, 15, 40, 0, 30)
     plate_locate.set_verify_value(1, 200, 4, .5)
     plate_locate.set_morph_hw(10, 3)
     plate_locate.plate_locate(my_img, "BLUE")
+    temp_plates = plate_locate.return_plates()
     plate_locate.img_show()
+    # for i in range(len(temp_plates)):
+    #     cv2.imwrite(os.path.abspath('../local') + os.path.sep + 'plates_' + str(i) + '.png',
+    #                 temp_plates[i])
