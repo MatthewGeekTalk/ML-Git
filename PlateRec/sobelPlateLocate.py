@@ -239,7 +239,7 @@ class SobelPlateLocate:
         plates = []
         i = 0
         for box in self.region:
-            cv2.drawContours(self.imgOrg, [box], 0, (0, 255, 0), 2)
+            # cv2.drawContours(self.imgOrg, [box], 0, (0, 255, 0), 2)
             ys = [box[0, 1], box[1, 1], box[2, 1], box[3, 1]]
             xs = [box[0, 0], box[1, 0], box[2, 0], box[3, 0]]
             ys_sorted_index = np.argsort(ys)
