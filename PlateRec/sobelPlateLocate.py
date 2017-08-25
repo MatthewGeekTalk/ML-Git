@@ -261,6 +261,9 @@ class SobelPlateLocate:
             i = i + 1
         return plates
 
+    def return_plates(self):
+        return self.plates
+
     def img_show(self):
         cv2.imshow('img', self.imgOrg)
         try:

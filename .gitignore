@@ -2,3 +2,5 @@
 .idea/
 Test/**/*.py
 PlateRec/__pycache__/
+Test/
+local/
