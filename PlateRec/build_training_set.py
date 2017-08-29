@@ -6,7 +6,6 @@ import numpy as np
 sys.path.insert(0, os.path.abspath('./'))
 from sobelPlateLocate import SobelPlateLocate
 from colorPlateLocate import ColorPlateLocate
-from rename import rename_tool
 
 BLUE = 'BLUE'
 
@@ -22,7 +21,7 @@ for i in range(len(materials)):
     path = os.path.abspath('../Training') + os.path.sep + str(materials[i])
     plate_color_digger.plate_locate(plate_color_digger.read_img(path), BLUE)
     plates = plate_color_digger.return_plates()
-    set_path = os.path.abspath('../training_set') + os.path.sep
+    set_path = os.path.abspath('../trainingSetColor') + os.path.sep
     for j in range(len(plates)):
         cv2.imwrite(set_path + 'plate' + str(i) + '_' + str(j) + '.jpg', plates[j])
 
