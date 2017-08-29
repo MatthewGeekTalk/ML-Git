@@ -84,7 +84,6 @@ class ColorPlateLocate:
         min_h, max_h = self.__set_min_max(case)
         img = cv2.inRange(img, min_h, max_h)
         img = self.__img_morph_close(img)
-        cv2.imshow('img2', img)
         region = self.__find_plate_number_region(img)
         plates = self.__detect_region(region, self.imgOrg)
         plates = self.__split_plate(plates, case)
@@ -137,7 +136,6 @@ class ColorPlateLocate:
                 y1 = safe_box[ys_sorted_index[0], 1]
                 y2 = safe_box[ys_sorted_index[3], 1]
                 bi_plate = img_binary[y1:y2, x1:x2]
-                # cv2.imshow('bi' + str(i), bi_plate)
                 img_plate = img_org[y1:y2, x1:x2]
                 is_plate, slope = self.__isdeflection(bi_plate)
                 if is_plate:
@@ -236,7 +234,6 @@ class ColorPlateLocate:
         region = []
         img_find = img.copy()
         im2, contours, hierarchy = cv2.findContours(img_find, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-        cv2.imshow('contours', im2)
         for i in range(len(contours)):
             cnt = contours[i]
             area = cv2.contourArea(cnt)
