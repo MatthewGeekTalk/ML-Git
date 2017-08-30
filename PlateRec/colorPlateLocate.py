@@ -38,6 +38,9 @@ class ColorPlateLocate:
         self.height = 0
         self.width = 0
 
+    def init_plates(self):
+        self.plates = []
+
     def set_size(self, height, width):
         self.height = height
         self.width = width
