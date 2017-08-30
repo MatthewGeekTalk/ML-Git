@@ -4,3 +4,6 @@ Test/**/*.py
 PlateRec/__pycache__/
 Test/
 local/
+trainingSetColor/
+trainingSetSobel/
+"PlateRec/tool/\344\270\255\345\233\275\347\211\214\347\205\247/"
