@@ -41,5 +41,5 @@ for i in range(len(materials)):
     plates = plate_sobel_digger.plate_locate()
     set_path = os.path.abspath('../trainingSetsobel') + os.path.sep
     for j in range(len(plates)):
-        cv2.imwrite(set_path + 'plate' + str(i) + '_' + str(j) + '.jpg', plates[j])
+        cv2.imwrite(set_path + 'platesobel' + str(i) + '_' + str(j) + '.jpg', plates[j])
 
