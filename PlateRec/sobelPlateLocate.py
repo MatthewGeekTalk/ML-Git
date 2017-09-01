@@ -22,6 +22,8 @@ class SobelPlateLocate:
         self.verify_error = 0
         self.rect = []
         self.angle = []
+        self.height = 0
+        self.width = 0
 
     def read_img(self, img_path):
         self.img = cv2.imread(img_path)
@@ -36,6 +38,11 @@ class SobelPlateLocate:
         self.region, self.angle = self.__find_plate_number_region()
         # self.img_opr = self.__sobelOper(self.img_opr, 3, 10, 3)
         self.plates = self.__detect_region()
+        return self.plates
+
+    def set_size(self, height, width):
+        self.height = height
+        self.width = width
 
     def set_gaussian_size(self, gaussian_blur_size):
         self.m_GaussianBlurSize = gaussian_blur_size
@@ -78,6 +85,9 @@ class SobelPlateLocate:
         element = cv2.getStructuringElement(cv2.MORPH_RECT, (morphW, morphH))
         return cv2.morphologyEx(img, cv2.MORPH_CLOSE, element)
 
+    def __resize_plates(self, img):
+        return cv2.resize(img, (self.width, self.height), interpolation=cv2.INTER_CUBIC)
+
     def __find_plate_number_region(self):
         region = []
         angle = []
@@ -116,7 +126,6 @@ class SobelPlateLocate:
         return region, angle
     #Enlarge and Rotation
     def __enlarge_rotation(self, src, angle):
-        img_opr = src.copy()
         # 增大图片边缘pedding
         size_original = (src.shape[1], src.shape[0])
         img_opr = self.__enlargeRegion(src)
@@ -130,15 +139,21 @@ class SobelPlateLocate:
         return img_opr
     # Deskew plate
     def __deskew(self, src, angle, src_sc):
-        img_opr = self.__enlarge_rotation(src, angle)
-        img_opr_sc = self.__enlarge_rotation(src_sc, angle)
+        if (src.shape[1] != 0 and src.shape[0] != 0):
+            img_opr = self.__enlarge_rotation(src, angle)
+        else:
+            return src_sc
+        if (src.shape[1] != 0 and src.shape[0] != 0):
+            img_opr_sc = self.__enlarge_rotation(src_sc, angle)
+        else:
+            return src_sc
         slope = 0
         err, slope = self.__isdeflection(img_opr, angle, slope)
         if (err):
             img_opr = self.__affine(img_opr_sc, slope)
         else:
             img_opr = img_opr_sc
-            print("Affine is not needed")
+            # print("Affine is not needed")
         return img_opr
     #仿射变换
     def __affine(self,src, slope):
@@ -254,10 +269,12 @@ class SobelPlateLocate:
             img_org_orginal = self.imgOrg.copy()
             img_plate = img_org[y1:y2, x1:x2]
             img_plate_sc = img_org_orginal[y1:y2, x1:x2]
-            # img_plate_bound = self.__sobelOper(img_plate_sc, 3, 6, 2)
-            if (self.angle[i][2] < -5 or self.angle[i][2] > 5):
-                img_plate_sc = self.__deskew(img_plate, self.angle[i][2], img_plate_sc)
-            plates.append(img_plate_sc)
+            if (img_plate.shape[1] != 0 and img_plate.shape[0] != 0 and
+                img_plate_sc.shape[1] != 0 and img_plate_sc.shape[0] != 0):
+                if (self.angle[i][2] < -5 or self.angle[i][2] > 5):
+                    img_plate_sc = self.__deskew(img_plate, self.angle[i][2], img_plate_sc)
+                img_plate_sc = self.__resize_plates(img_plate_sc)
+                plates.append(img_plate_sc)
             i = i + 1
         return plates
 
@@ -279,9 +296,9 @@ if __name__ == '__main__':
     path = input('Please input your image path:')
     plate_locate = SobelPlateLocate()
     plate_locate.read_img(path)
-    # plate_locate.read_img('plate2.jpg')
+    plate_locate.set_size(20, 72)
     plate_locate.set_gaussian_size(5)
     plate_locate.set_morph_hw(17, 3)
     plate_locate.set_verify_value(1, 100, 4, .5)
-    plate_locate.plate_locate()
+    plates = plate_locate.plate_locate()
     plate_locate.img_show()
