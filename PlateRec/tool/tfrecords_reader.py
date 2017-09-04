@@ -14,6 +14,7 @@ class tfrecords_reader:
 
     def _load_tfrecords(self):
         tfrecords = os.listdir(self.tfrecord_path)
+        features = object
         for tfrecord in tfrecords:
             data_path = self.tfrecord_path + os.path.sep + tfrecord
             feature = {'train/image': tf.FixedLenFeature([], tf.string),
