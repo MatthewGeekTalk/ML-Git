@@ -38,7 +38,7 @@ class tfrecords_builder:
             feature = {'train/label': self._int64_feature(labels[i]),
                        'train/image': self._bytes_feature(tf.compat.as_bytes(imgs[i].tostring()))}
             example = tf.train.Example(features=tf.train.Features(feature=feature))
-        writer.write(example.SerializeToString())
+            writer.write(example.SerializeToString())
 
         writer.close()
 
@@ -49,7 +49,6 @@ class tfrecords_builder:
     @staticmethod
     def _get_img(path):
         img = cv2.imread(path)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = img.astype(np.float32)
         return img
 

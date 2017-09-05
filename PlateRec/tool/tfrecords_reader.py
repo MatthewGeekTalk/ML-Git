@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
+import cv2
 import os
 
 
@@ -18,7 +19,7 @@ class tfrecords_reader:
     def _load_tfrecords(self):
         tfrecords = os.listdir(self.tfrecord_path)
         data_path = os.path.abspath('../TFRecords') + os.path.sep + tfrecords[0]
-        filename_queue = tf.train.string_input_producer([data_path], name='queue')
+        filename_queue = tf.train.string_input_producer([data_path], num_epochs=1, name='queue')
         reader = tf.TFRecordReader()
         _, serialized_example = reader.read(filename_queue)
         feature = {'train/image': tf.FixedLenFeature([], tf.string),
@@ -55,9 +56,7 @@ if __name__ == '__main__':
     path = os.path.abspath('../TFRecords')
     reader = tfrecords_reader(path)
     imgs, labels = reader.main()
-    for i in range(len(imgs)):
-        if i > 5:
-            break
-        plt.subplot(2, 3, i + 1)
-        plt.imshow(imgs[i, ...])
-        plt.show()
+    for img in imgs:
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        cv2.imshow('1', img)
+        cv2.waitKey(0)
