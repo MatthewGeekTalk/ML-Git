@@ -56,3 +56,4 @@ if __name__ == '__main__':
     path = os.path.abspath('../TFRecords')
     reader = tfrecords_reader(path)
     imgs, labels = reader.main()
+
