@@ -1,5 +1,6 @@
 import tensorflow as tf
-import cv2
+import numpy as np
+import matplotlib.pyplot as plt
 import os
 
 
@@ -21,15 +22,13 @@ class tfrecords_reader:
         reader = tf.TFRecordReader()
         _, serialized_example = reader.read(filename_queue)
         feature = {'train/image': tf.FixedLenFeature([], tf.string),
-                   'train/shape': tf.FixedLenFeature([], tf.string),
                    'train/label': tf.FixedLenFeature([], tf.int64)}
         features = tf.parse_single_example(serialized_example, features=feature, name='features')
         return features
 
     @staticmethod
     def _get_data_label(features):
-        image = tf.decode_raw(features['train/image'], tf.uint8)
-        shape = tf.decode_raw(features['train/shape'], tf.int32)
+        image = tf.decode_raw(features['train/image'], tf.float32)
         label = tf.cast(features['train/label'], tf.int32)
         image = tf.reshape(image, [50, 180, 3])
         images, labels = tf.train.shuffle_batch([image, label],
@@ -40,13 +39,13 @@ class tfrecords_reader:
 
         return images, labels
 
-    def _read_data(self, imgs, labels):
+    def _read_data(self, imgs, lbls):
         with tf.Session() as sess:
-            init_op = tf.global_variables_initializer()
+            init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
             sess.run(init_op)
             coord = tf.train.Coordinator()
             threads = tf.train.start_queue_runners(coord=coord)
-            images, labels = sess.run([imgs, labels])
+            images, labels = sess.run([imgs, lbls])
             coord.request_stop()
             coord.join(threads)
         return images, labels
@@ -56,4 +55,9 @@ if __name__ == '__main__':
     path = os.path.abspath('../TFRecords')
     reader = tfrecords_reader(path)
     imgs, labels = reader.main()
-
+    for i in range(len(imgs)):
+        if i > 5:
+            break
+        plt.subplot(2, 3, i + 1)
+        plt.imshow(imgs[i, ...])
+        plt.show()
