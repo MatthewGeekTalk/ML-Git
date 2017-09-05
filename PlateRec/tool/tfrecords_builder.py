@@ -49,7 +49,8 @@ class tfrecords_builder:
     @staticmethod
     def _get_img(path):
         img = cv2.imread(path)
-        img = img.astype(np.float32)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = img.astype(np.uint8)
         return img
 
     @staticmethod
