@@ -7,6 +7,7 @@ sys.path.insert(0, os.path.abspath('./'))
 from sobelPlateLocate import SobelPlateLocate
 from colorPlateLocate import ColorPlateLocate
 
+
 BLUE = 'BLUE'
 
 # plates = []
