@@ -1,6 +1,6 @@
 import numpy as np
 import tensorflow as tf
-import cv2
+from PIL import Image
 import os
 
 
@@ -48,8 +48,8 @@ class tfrecords_builder:
 
     @staticmethod
     def _get_img(path):
-        img = cv2.imread(path)
-        img = img.astype(np.float32)
+        img = Image.open(path)
+        img = np.asarray(img, np.float32)
         return img
 
     @staticmethod
