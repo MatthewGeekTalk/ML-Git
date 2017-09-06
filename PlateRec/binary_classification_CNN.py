@@ -139,7 +139,7 @@ class deepcnn:
 
 
 if __name__ == '__main__':
-    x = tf.placeholder(tf.float32, [None, 16200])
+    x = tf.placeholder(tf.float32, [None, 27000])
     y_ = tf.placeholder(tf.float32, [None, 2])
     keep_prob = tf.placeholder(tf.float32)
 
@@ -179,7 +179,7 @@ if __name__ == '__main__':
     with tf.Session() as sess:
         init_op = tf.group(tf.local_variables_initializer(), tf.global_variables_initializer())
         sess.run(init_op)
-        for i in range(10000):
+        for i in range(20000):
             imgs, labels = reader.main(batch=BATCH_SIZE)
             if i % 50 == 0:
                 train_accuracy = accuracy.eval(train_accuracy=accuracy.eval(feed_dict={
