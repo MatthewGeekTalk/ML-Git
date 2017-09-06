@@ -57,7 +57,8 @@ if __name__ == '__main__':
     reader = tfrecords_reader(path)
     imgs, labels = reader.main()
     for i in range (len(imgs)):
-        # img = cv2.cvtColor(imgs[i], cv2.COLOR_BGR2RGB)
-        plt.imshow(imgs[i])
-        plt.show()
+        img = cv2.cvtColor(imgs[i], cv2.COLOR_RGB2BGR)
+        cv2.imshow('test' + str(i), img)
+        # plt.imshow(imgs[i])
+        # plt.show()
     cv2.waitKey(0)
