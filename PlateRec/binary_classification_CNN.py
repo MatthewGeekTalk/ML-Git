@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 import sys
 import os
+import tempfile
 
 sys.path.append(os.path.abspath('./'))
 
@@ -10,7 +11,7 @@ from tfrecords_reader import tfrecords_reader
 
 class deepcnn:
     def __init__(self, x):
-        self.x = tf.reshape(x, [-1, 30, 180, 3])
+        self.x = tf.reshape(x, [-1, 20, 72, 3])
         self.conv1_name = ""
         self.conv2_name = ""
         self.pool1_name = ""
@@ -26,6 +27,8 @@ class deepcnn:
         self.dense_bias_shape = []
         self.output_weight_shape = []
         self.output_bias_shape = []
+
+        self.keep_prob = 0
 
     def set_name(self, conv1, conv2, pool1, pool2, dense, output, dropout):
         self.conv1_name = conv1
@@ -52,6 +55,9 @@ class deepcnn:
         self.output_weight_shape = weight_shape
         self.output_bias_shape = bias_shape
 
+    def set_keep_prob(self, keep_prob):
+        self.keep_prob = keep_prob
+
     def get_conv1_shape(self):
         return self.conv1_weight_shape, self.conv1_bias_shape
 
@@ -63,6 +69,9 @@ class deepcnn:
 
     def get_output_shape(self):
         return self.output_weight_shape, self.output_bias_shape
+
+    def get_keep_prob(self):
+        return self.keep_prob
 
     @staticmethod
     def _weight_variable(shape):
@@ -84,9 +93,8 @@ class deepcnn:
                               strides=[1, 2, 2, 1], padding='SAME')
 
     @staticmethod
-    def _build_dropout(name, x):
+    def _build_dropout(name, x, keep_prob):
         with tf.name_scope(name=name):
-            keep_prob = tf.placeholder(tf.float32)
             h_dense_drop = tf.nn.dropout(x, keep_prob)
             return h_dense_drop
 
@@ -132,10 +140,50 @@ class deepcnn:
 if __name__ == '__main__':
     x = tf.placeholder(tf.float32, [None, 16200])
     y_ = tf.placeholder(tf.float32, [None, 2])
+    keep_prob = tf.placeholder(tf.float32)
 
     cnn = deepcnn()
 
     cnn.set_name(conv1='conv1', conv2='conv2', pool1='max pool1', pool2='max pool2', dense='full connection',
                  output='final output', dropout='drop out')
-    # cnn.set_conv1_shape([5, 5, 3, 32], [32])
-    # cnn.set_conv2_shape()
+    cnn.set_conv1_shape([5, 5, 3, 32], [32])
+    cnn.set_conv2_shape([5, 5, 32, 64], [64])
+    cnn.set_dense_shape([5 * 18 * 64, 1024], [1024])
+    cnn.set_output_shape([1024, 2], [2])
+    cnn.set_keep_prob(keep_prob)
+    y_conv = cnn.build_cnn()
+
+    with tf.name_scope(name='loss'):
+        cross_entropy = tf.nn.softmax_cross_entropy_with_logits(labels=y_, logits=y_conv)
+
+    cross_entropy = tf.reduce_mean(cross_entropy)
+
+    with tf.name_scope(name='adam_optimizer'):
+        train_step = tf.train.AdamOptimizer(1e-4).minimize(cross_entropy)
+
+    with tf.name_scope('accuracy'):
+        correct_prediction = tf.equal(tf.argmax(y_conv, 1), tf.argmax(y_, 1))
+        correct_prediction = tf.cast(correct_prediction, tf.float32)
+
+    accuracy = tf.reduce_mean(correct_prediction)
+
+    graph_location = tempfile.mkdtemp()
+    print('Saving graph to: %s' % graph_location)
+    train_writer = tf.summary.FileWriter(graph_location)
+    train_writer.add_graph(tf.get_default_graph())
+
+    path = os.path.abspath('../TFRecords')
+    reader = tfrecords_reader(path)
+
+    with tf.Session() as sess:
+        init_op = tf.group(tf.local_variables_initializer(), tf.global_variables_initializer())
+        sess.run(init_op)
+        batch_size = 50
+        for i in range(10000):
+            imgs, labels = reader.main(batch=batch_size)
+            if i % 50 == 0:
+                train_accuracy = accuracy.eval(train_accuracy=accuracy.eval(feed_dict={
+                    x: imgs, y_: labels, keep_prob: 1.0}))
+                print('step %d, training accuracy %g' % (i, train_accuracy))
+            train_step.run(feed_dict={x: imgs, y_: labels, keep_prob: 0.5})
+

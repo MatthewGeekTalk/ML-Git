@@ -11,9 +11,9 @@ class tfrecords_reader:
         self.labels = []
         self.tfrecord_path = path
 
-    def main(self):
+    def main(self, batch):
         features = self._load_tfrecords()
-        imgs, labels = self._get_data_label(features)
+        imgs, labels = self._get_data_label(features, batch)
         return self._read_data(imgs, labels)
 
     def _load_tfrecords(self):
@@ -28,12 +28,12 @@ class tfrecords_reader:
         return features
 
     @staticmethod
-    def _get_data_label(features):
+    def _get_data_label(features, batch):
         image = tf.decode_raw(features['train/image'], tf.uint8)
         label = tf.cast(features['train/label'], tf.int32)
         image = tf.reshape(image, [50, 180, 3])
         images, labels = tf.train.shuffle_batch([image, label],
-                                                batch_size=30,
+                                                batch_size=batch,
                                                 capacity=30,
                                                 num_threads=1,
                                                 min_after_dequeue=10)
@@ -55,8 +55,8 @@ class tfrecords_reader:
 if __name__ == '__main__':
     path = os.path.abspath('../TFRecords')
     reader = tfrecords_reader(path)
-    imgs, labels = reader.main()
-    for i in range (len(imgs)):
+    imgs, labels = reader.main(50)
+    for i in range(len(imgs)):
         img = cv2.cvtColor(imgs[i], cv2.COLOR_RGB2BGR)
         cv2.imshow('test' + str(i), img)
         # plt.imshow(imgs[i])
