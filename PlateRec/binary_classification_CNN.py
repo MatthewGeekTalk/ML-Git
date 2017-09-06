@@ -10,9 +10,10 @@ from tfrecords_reader import tfrecords_reader
 
 BATCH_SIZE = 50
 
+
 class deepcnn:
     def __init__(self, x):
-        self.x = tf.reshape(x, [-1, 20, 72, 3])
+        self.x = tf.reshape(x, [-1, 50, 180, 3])
         self.conv1_name = ""
         self.conv2_name = ""
         self.pool1_name = ""
@@ -89,9 +90,9 @@ class deepcnn:
         return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
 
     @staticmethod
-    def _max_pool_2x2(x):
-        return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
-                              strides=[1, 2, 2, 1], padding='SAME')
+    def _max_pool(x, width, height):
+        return tf.nn.max_pool(x, ksize=[1, width, height, 1],
+                              strides=[1, width, height, 1], padding='SAME')
 
     @staticmethod
     def _build_dropout(name, x, keep_prob):
@@ -106,9 +107,9 @@ class deepcnn:
             h_conv1 = tf.nn.relu(self._conv2d(x, W_conv1) + b_conv1)
             return h_conv1
 
-    def _build_pool(self, name, conv):
+    def _build_pool(self, name, conv, width, height):
         with tf.name_scope(name=name):
-            h_pool = self._max_pool_2x2(conv)
+            h_pool = self._max_pool(conv, width=width, height=height)
             return h_pool
 
     def _build_dense(self, name, weight_shape, bias_shape, x):
@@ -129,9 +130,9 @@ class deepcnn:
 
     def build_cnn(self):
         h_conv1 = self._build_conv(self.conv1_name, self.conv1_weight_shape, self.conv1_bias_shape, self.x)
-        h_pool1 = self._build_pool(self.pool1_name, h_conv1)
+        h_pool1 = self._build_pool(self.pool1_name, h_conv1, 2, 2)
         h_conv2 = self._build_conv(self.conv2_name, self.conv2_weight_shape, self.conv2_bias_shape, h_pool1)
-        h_pool2 = self._build_pool(self.pool2_name, h_conv2)
+        h_pool2 = self._build_pool(self.pool2_name, h_conv2, 5, 5)
         h_dense = self._build_dense(self.dense_name, self.dense_weight_shape, self.dense_bias_shape, h_pool2)
         h_dense_drop = self._build_dropout(self.dropout_name, h_dense, self.keep_prob)
         y_conv = self._build_dense(self.output_name, self.output_weight_shape, self.output_bias_shape, h_dense_drop)
@@ -140,7 +141,7 @@ class deepcnn:
 
 if __name__ == '__main__':
     x = tf.placeholder(tf.float32, [None, 27000])
-    y_ = tf.placeholder(tf.float32, [None, 2])
+    y_ = tf.placeholder(tf.float32, [None, 1])
     keep_prob = tf.placeholder(tf.float32)
 
     cnn = deepcnn(x)
@@ -150,7 +151,7 @@ if __name__ == '__main__':
     cnn.set_conv1_shape([5, 5, 3, 32], [32])
     cnn.set_conv2_shape([5, 5, 32, 64], [64])
     cnn.set_dense_shape([5 * 18 * 64, 1024], [1024])
-    cnn.set_output_shape([1024, 2], [2])
+    cnn.set_output_shape([1024, 1], [1])
     cnn.set_keep_prob(keep_prob)
     y_conv = cnn.build_cnn()
 
@@ -181,9 +182,9 @@ if __name__ == '__main__':
         sess.run(init_op)
         for i in range(20000):
             imgs, labels = reader.main(batch=BATCH_SIZE)
+            imgs = np.reshape(imgs, [BATCH_SIZE, 50 * 180 * 3])
+            labels = np.reshape(labels, [BATCH_SIZE, 1])
             if i % 50 == 0:
-                train_accuracy = accuracy.eval(train_accuracy=accuracy.eval(feed_dict={
-                    x: imgs, y_: labels, keep_prob: 1.0}))
+                train_accuracy = accuracy.eval(feed_dict={x: imgs, y_: labels, keep_prob: 1.0})
                 print('step %d, training accuracy %g' % (i, train_accuracy))
             train_step.run(feed_dict={x: imgs, y_: labels, keep_prob: 0.5})
-
