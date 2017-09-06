@@ -4,7 +4,7 @@ import sys
 import os
 import tempfile
 
-sys.path.append(os.path.abspath('./'))
+sys.path.append(os.path.abspath('./tool/'))
 
 from tfrecords_reader import tfrecords_reader
 
@@ -132,7 +132,7 @@ class deepcnn:
         h_conv2 = self._build_conv(self.conv2_name, self.conv2_weight_shape, self.conv2_bias_shape, h_pool1)
         h_pool2 = self._build_pool(self.pool2_name, h_conv2)
         h_dense = self._build_dense(self.dense_name, self.dense_weight_shape, self.dense_bias_shape, h_pool2)
-        h_dense_drop = self._build_dropout(self.dropout_name, h_dense)
+        h_dense_drop = self._build_dropout(self.dropout_name, h_dense, self.keep_prob)
         y_conv = self._build_dense(self.output_name, self.output_weight_shape, self.output_bias_shape, h_dense_drop)
         return y_conv
 
@@ -142,10 +142,10 @@ if __name__ == '__main__':
     y_ = tf.placeholder(tf.float32, [None, 2])
     keep_prob = tf.placeholder(tf.float32)
 
-    cnn = deepcnn()
+    cnn = deepcnn(x)
 
-    cnn.set_name(conv1='conv1', conv2='conv2', pool1='max pool1', pool2='max pool2', dense='full connection',
-                 output='final output', dropout='drop out')
+    cnn.set_name(conv1='conv1', conv2='conv2', pool1='pool1', pool2='pool2', dense='dense',
+                 output='output', dropout='dropout')
     cnn.set_conv1_shape([5, 5, 3, 32], [32])
     cnn.set_conv2_shape([5, 5, 32, 64], [64])
     cnn.set_dense_shape([5 * 18 * 64, 1024], [1024])
@@ -172,7 +172,7 @@ if __name__ == '__main__':
     train_writer = tf.summary.FileWriter(graph_location)
     train_writer.add_graph(tf.get_default_graph())
 
-    path = os.path.abspath('../TFRecords')
+    path = os.path.abspath('./TFRecords')
     reader = tfrecords_reader(path)
 
     with tf.Session() as sess:
