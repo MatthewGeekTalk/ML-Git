@@ -8,6 +8,7 @@ sys.path.append(os.path.abspath('./tool/'))
 
 from tfrecords_reader import tfrecords_reader
 
+BATCH_SIZE = 50
 
 class deepcnn:
     def __init__(self, x):
@@ -178,9 +179,8 @@ if __name__ == '__main__':
     with tf.Session() as sess:
         init_op = tf.group(tf.local_variables_initializer(), tf.global_variables_initializer())
         sess.run(init_op)
-        batch_size = 50
         for i in range(10000):
-            imgs, labels = reader.main(batch=batch_size)
+            imgs, labels = reader.main(batch=BATCH_SIZE)
             if i % 50 == 0:
                 train_accuracy = accuracy.eval(train_accuracy=accuracy.eval(feed_dict={
                     x: imgs, y_: labels, keep_prob: 1.0}))
