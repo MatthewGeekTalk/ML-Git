@@ -7,4 +7,4 @@ ADD tool /root/
 ADD binary_classification_CNN.py /root/
 
 WORKDIR "/root"
-CMD ["python", "binary_classification_CNN.py"]
+CMD ["python3", "binary_classification_CNN.py"]
