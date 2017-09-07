@@ -1,7 +1,4 @@
 import tensorflow as tf
-import numpy as np
-import matplotlib.pyplot as plt
-import cv2
 import os
 
 
@@ -56,9 +53,3 @@ if __name__ == '__main__':
     path = os.path.abspath('../TFRecords')
     reader = tfrecords_reader(path)
     imgs, labels = reader.main(50)
-    for i in range(len(imgs)):
-        img = cv2.cvtColor(imgs[i], cv2.COLOR_RGB2BGR)
-        cv2.imshow('test' + str(i), img)
-        # plt.imshow(imgs[i])
-        # plt.show()
-    cv2.waitKey(0)
