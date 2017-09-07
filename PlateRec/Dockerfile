@@ -4,7 +4,7 @@ MAINTAINER Andy Zhang <andy.zhang02@sap.com>
 
 ADD TFRecords /root/
 ADD tool /root/
-ADD binary_classifiaction_CNN.py /root/
+ADD binary_classification_CNN.py /root/
 
 WORKDIR "/root"
-CMD ["python", "binary_classifiaction_CNN.py", "--data_dir=/root/TFRecords"]
+CMD ["python", "binary_classification_CNN.py", "--data_dir=/root/TFRecords"]
