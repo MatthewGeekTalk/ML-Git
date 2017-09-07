@@ -140,7 +140,7 @@ class deepcnn:
 
 
 if __name__ == '__main__':
-    x = tf.placeholder(tf.float32, [None, 27000])
+    x = tf.placeholder(tf.float32, [None, 50 * 180 * 3])
     y_ = tf.placeholder(tf.float32, [None, 1])
     keep_prob = tf.placeholder(tf.float32)
 
