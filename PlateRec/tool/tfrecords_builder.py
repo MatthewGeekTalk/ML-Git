@@ -6,8 +6,8 @@ import os
 
 class tfrecords_builder:
     def __init__(self):
-        self.PLATES_ADDR = os.path.abspath('../../Plates/0')
-        self.NON_PLATES_ADDR = os.path.abspath('../../Plates/1')
+        self.PLATES_ADDR = os.path.abspath('../../Plates/2')
+        self.NON_PLATES_ADDR = os.path.abspath('../../Plates/3')
         self.IS_PLATE = 0
         self.NOT_PLATE = 1
         self.TFRECORDS_ADDR = os.path.abspath('../TFRecords')
