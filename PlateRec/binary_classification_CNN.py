@@ -13,7 +13,7 @@ BATCH_SIZE = 50
 
 class deepcnn:
     def __init__(self, x):
-        self.x = tf.reshape(x, [-1, 50, 180, 3])
+        self.x = tf.reshape(x, [-1, 20, 70, 3])
         self.conv1_name = ""
         self.conv2_name = ""
         self.pool1_name = ""
@@ -140,7 +140,7 @@ class deepcnn:
 
 
 if __name__ == '__main__':
-    x = tf.placeholder(tf.float32, [None, 50 * 180 * 3])
+    x = tf.placeholder(tf.float32, [None, 20 * 70 * 3])
     y_ = tf.placeholder(tf.float32, [None, 1])
     keep_prob = tf.placeholder(tf.float32)
 
@@ -150,7 +150,7 @@ if __name__ == '__main__':
                  output='output', dropout='dropout')
     cnn.set_conv1_shape([5, 5, 3, 32], [32])
     cnn.set_conv2_shape([5, 5, 32, 64], [64])
-    cnn.set_dense_shape([5 * 18 * 64, 1024], [1024])
+    cnn.set_dense_shape([5 * 17.5 * 64, 1024], [1024])
     cnn.set_output_shape([1024, 1], [1])
     cnn.set_keep_prob(keep_prob)
     y_conv = cnn.build_cnn()
@@ -182,7 +182,7 @@ if __name__ == '__main__':
         sess.run(init_op)
         for i in range(20000):
             imgs, labels = reader.main(batch=BATCH_SIZE)
-            imgs = np.reshape(imgs, [BATCH_SIZE, 50 * 180 * 3])
+            imgs = np.reshape(imgs, [BATCH_SIZE, 20 * 70 * 3])
             labels = np.reshape(labels, [BATCH_SIZE, 1])
             if i % 50 == 0:
                 train_accuracy = accuracy.eval(feed_dict={x: imgs, y_: labels, keep_prob: 1.0})
