@@ -132,7 +132,7 @@ class deepcnn:
         h_conv1 = self._build_conv(self.conv1_name, self.conv1_weight_shape, self.conv1_bias_shape, self.x)
         h_pool1 = self._build_pool(self.pool1_name, h_conv1, 2, 2)
         h_conv2 = self._build_conv(self.conv2_name, self.conv2_weight_shape, self.conv2_bias_shape, h_pool1)
-        h_pool2 = self._build_pool(self.pool2_name, h_conv2, 5, 5)
+        h_pool2 = self._build_pool(self.pool2_name, h_conv2, 2, 2)
         h_dense = self._build_dense(self.dense_name, self.dense_weight_shape, self.dense_bias_shape, h_pool2)
         h_dense_drop = self._build_dropout(self.dropout_name, h_dense, self.keep_prob)
         y_conv = self._build_dense(self.output_name, self.output_weight_shape, self.output_bias_shape, h_dense_drop)
