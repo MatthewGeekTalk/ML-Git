@@ -170,7 +170,7 @@ if __name__ == '__main__':
     accuracy = tf.reduce_mean(correct_prediction)
 
     graph_location = tempfile.mkdtemp()
-    print('Saving graph to: %s' % graph_location)
+    print('Saving  graph to: %s' % graph_location)
     train_writer = tf.summary.FileWriter(graph_location)
     train_writer.add_graph(tf.get_default_graph())
 
