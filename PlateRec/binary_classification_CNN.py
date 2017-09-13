@@ -150,7 +150,7 @@ if __name__ == '__main__':
                  output='output', dropout='dropout')
     cnn.set_conv1_shape([5, 5, 3, 32], [32])
     cnn.set_conv2_shape([5, 5, 32, 64], [64])
-    cnn.set_dense_shape([5 * 17.5 * 64, 1024], [1024])
+    cnn.set_dense_shape([5 * 18 * 64, 1024], [1024])
     cnn.set_output_shape([1024, 1], [1])
     cnn.set_keep_prob(keep_prob)
     y_conv = cnn.build_cnn()
