@@ -8,7 +8,7 @@ sys.path.append(os.path.abspath('./tool/'))
 
 from tfrecords_reader import tfrecords_reader
 
-BATCH_SIZE = 4
+BATCH_SIZE = 50
 
 
 class deepcnn:
