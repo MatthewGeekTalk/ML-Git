@@ -189,4 +189,5 @@ if __name__ == '__main__':
             if i % 50 == 0:
                 train_accuracy = accuracy.eval(feed_dict={x: imgs, y_: labels, keep_prob: 1.0})
                 print('step %d, training accuracy %g' % (i, train_accuracy))
+            print(i)
             train_step.run(feed_dict={x: imgs, y_: labels, keep_prob: 0.5})

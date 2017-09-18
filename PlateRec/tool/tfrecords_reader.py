@@ -29,11 +29,15 @@ class tfrecords_reader:
         image = tf.decode_raw(features['train/image'], tf.uint8)
         label = tf.cast(features['train/label'], tf.int32)
         image = tf.reshape(image, [20, 70, 3])
-        images, labels = tf.train.shuffle_batch([image, label],
-                                                batch_size=batch,
-                                                capacity=30,
-                                                num_threads=1,
-                                                min_after_dequeue=10)
+        # images, labels = tf.train.shuffle_batch([image, label],
+        #                                         batch_size=batch,
+        #                                         capacity=30,
+        #                                         num_threads=1,
+        #                                         min_after_dequeue=10)
+        images, labels = tf.train.batch([image, label],
+                                        batch_size=batch,
+                                        capacity=32,
+                                        num_threads=1)
 
         return images, labels
 
