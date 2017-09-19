@@ -179,7 +179,7 @@ if __name__ == '__main__':
 
     config = tf.ConfigProto()
     config.gpu_options.per_process_gpu_memory_fraction = 0.2
-    with tf.Session(config = config) as sess:
+    with tf.Session(config=config) as sess:
         init_op = tf.group(tf.local_variables_initializer(), tf.global_variables_initializer())
         sess.run(init_op)
         for i in range(20000):
