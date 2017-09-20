@@ -10,8 +10,18 @@ class tfrecords_reader:
 
     def main(self, batch):
         features = self._load_tfrecords()
-        imgs, labels = self._get_data_label(features, batch)
-        return self._read_data(imgs, labels)
+        #imgs, labels = self._get_data_label(features, batch)
+        #return self._read_data(imgs, labels)
+        with tf.Session() as sess:
+            init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
+            sess.run(init_op)
+            coord = tf.train.Coordinator()
+            threads = tf.train.start_queue_runners(coord=coord)
+            imgs, lbls = self._get_data_label(features, batch)
+            images, labels = sess.run([imgs, lbls])
+            coord.request_stop()
+            coord.join(threads)
+        return imgs, labels
 
     def _load_tfrecords(self):
         tfrecords = os.listdir(self.tfrecord_path)
@@ -29,16 +39,23 @@ class tfrecords_reader:
         image = tf.decode_raw(features['train/image'], tf.uint8)
         label = tf.cast(features['train/label'], tf.int32)
         image = tf.reshape(image, [20, 70, 3])
-        images, labels = tf.train.shuffle_batch([image, label],
-                                                batch_size=batch,
-                                                capacity=30,
-                                                num_threads=1,
-                                                min_after_dequeue=10)
+        #images, labels = tf.train.shuffle_batch([image, label],
+        #                                        batch_size=batch,
+        #                                        capacity=30,
+        #                                        num_threads=1,
+        #                                        min_after_dequeue=10)
+        images, labels = tf.train.batch([image, label],
+                                        batch_size=batch,
+                                        capacity=32000,
+					enqueue_many=False,
+                                        num_threads=1)
 
         return images, labels
 
     def _read_data(self, imgs, lbls):
-        with tf.Session() as sess:
+        config = tf.ConfigProto()
+        config.gpu_options.allow_growth = True
+        with tf.Session(config = config) as sess:
             init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
             sess.run(init_op)
             coord = tf.train.Coordinator()
