@@ -21,7 +21,7 @@ class tfrecords_reader:
             images, labels = sess.run([imgs, lbls])
             coord.request_stop()
             coord.join(threads)
-	return imgs, labels
+        return imgs, labels
 
     def _load_tfrecords(self):
         tfrecords = os.listdir(self.tfrecord_path)
@@ -47,7 +47,11 @@ class tfrecords_reader:
         images, labels = tf.train.batch([image, label],
                                         batch_size=batch,
                                         capacity=32000,
+<<<<<<< HEAD
 					enqueue_many=False,
+=======
+                                        enqueue_many=False,
+>>>>>>> 9d92a91aa261d051b1866e7747cab2b70f3506f1
                                         num_threads=1)
 
         return images, labels
