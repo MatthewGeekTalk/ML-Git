@@ -5,10 +5,11 @@ import os
 import tempfile
 
 sys.path.append(os.path.abspath('./tool/'))
+sys.path.append(os.path.abspath('./TFRecords/'))
 
 from tfrecords_reader import tfrecords_reader
 
-BATCH_SIZE = 50
+BATCH_SIZE = 1
 
 
 class deepcnn:
@@ -174,11 +175,11 @@ if __name__ == '__main__':
     # train_writer = tf.summary.FileWriter(graph_location)
     # train_writer.add_graph(tf.get_default_graph())
 
-    path = os.path.abspath('./TFRecords')
+    path = os.path.abspath('./')
     reader = tfrecords_reader(path)
 
     config = tf.ConfigProto()
-    config.gpu_options.per_process_gpu_memory_fraction = 0.2
+    config.gpu_options.allow_growth = True
     with tf.Session(config = config) as sess:
         init_op = tf.group(tf.local_variables_initializer(), tf.global_variables_initializer())
         sess.run(init_op)
@@ -189,5 +190,4 @@ if __name__ == '__main__':
             if i % 50 == 0:
                 train_accuracy = accuracy.eval(feed_dict={x: imgs, y_: labels, keep_prob: 1.0})
                 print('step %d, training accuracy %g' % (i, train_accuracy))
-            print(i)
             train_step.run(feed_dict={x: imgs, y_: labels, keep_prob: 0.5})
