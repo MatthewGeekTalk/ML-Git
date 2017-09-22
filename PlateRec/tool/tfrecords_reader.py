@@ -12,12 +12,12 @@ class tfrecords_reader:
         features = self._load_tfrecords()
         # imgs, labels = self._get_data_label(features, batch)
         # return self._read_data(imgs, labels)
+        imgs, lbls = self._get_data_label(features, batch)
         with tf.Session() as sess:
             init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
             sess.run(init_op)
             coord = tf.train.Coordinator()
             threads = tf.train.start_queue_runners(coord=coord)
-            imgs, lbls = self._get_data_label(features, batch)
             images, labels = sess.run([imgs, lbls])
             coord.request_stop()
             coord.join(threads)
@@ -46,7 +46,7 @@ class tfrecords_reader:
         #                                        min_after_dequeue=10)
         images, labels = tf.train.batch([image, label],
                                         batch_size=batch,
-                                        capacity=32000,
+                                        capacity=32,
                                         enqueue_many=False,
                                         num_threads=1)
 
@@ -70,3 +70,5 @@ if __name__ == '__main__':
     path = os.path.abspath('../TFRecords')
     reader = tfrecords_reader(path)
     imgs, labels = reader.main(50)
+    print(imgs.shape)
+    print(labels.shape)
