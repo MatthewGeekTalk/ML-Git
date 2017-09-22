@@ -9,7 +9,7 @@ sys.path.append(os.path.abspath('./TFRecords/'))
 
 from tfrecords_reader import tfrecords_reader
 
-BATCH_SIZE = 50
+BATCH_SIZE = 1
 
 
 class deepcnn:

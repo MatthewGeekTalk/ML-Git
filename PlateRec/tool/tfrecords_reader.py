@@ -47,13 +47,15 @@ class tfrecords_reader:
         images, labels = tf.train.batch([image, label],
                                         batch_size=batch,
                                         capacity=32000,
-                                        enqueue_many=False,
+					enqueue_many=False,
                                         num_threads=1)
 
         return images, labels
 
     def _read_data(self, imgs, lbls):
-        with tf.Session() as sess:
+        config = tf.ConfigProto()
+        config.gpu_options.allow_growth = True
+        with tf.Session(config = config) as sess:
             init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
             sess.run(init_op)
             coord = tf.train.Coordinator()
