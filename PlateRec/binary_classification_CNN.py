@@ -8,6 +8,7 @@ sys.path.append(os.path.abspath('./tool/'))
 from tfrecords_reader import tfrecords_reader
 
 BATCH_SIZE = 50
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 
 class deepcnn:
@@ -178,10 +179,10 @@ if __name__ == '__main__':
 
     # config = tf.ConfigProto()
     # config.gpu_options.allow_growth = True
-    # with tf.Session(config = config) as sess:
+    # with tf.Session(config=config) as sess:
     with tf.Session() as sess:
-        # init_op = tf.group(tf.local_variables_initializer(), tf.global_variables_initializer())
-        init_op = tf.global_variables_initializer()
+        init_op = tf.group(tf.local_variables_initializer(), tf.global_variables_initializer())
+        # init_op = tf.global_variables_initializer()
         sess.run(init_op)
         for i in range(20000):
             imgs, labels = reader.main(batch=BATCH_SIZE)
