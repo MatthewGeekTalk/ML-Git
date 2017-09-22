@@ -21,6 +21,8 @@ class tfrecords_reader:
             images, labels = sess.run([imgs, lbls])
             coord.request_stop()
             coord.join(threads)
+            print(imgs.shape)
+            print(labels.shape)
         return imgs, labels
 
     def _load_tfrecords(self):
@@ -70,5 +72,4 @@ if __name__ == '__main__':
     path = os.path.abspath('../TFRecords')
     reader = tfrecords_reader(path)
     imgs, labels = reader.main(50)
-    print(imgs.shape)
-    print(labels.shape)
+
