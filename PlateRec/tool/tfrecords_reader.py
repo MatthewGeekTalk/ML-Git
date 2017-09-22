@@ -15,15 +15,14 @@ class tfrecords_reader:
         imgs, lbls = self._get_data_label(features, batch)
         with tf.Session() as sess:
             init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
+            # init_op = tf.global_variables_initializer()
             sess.run(init_op)
             coord = tf.train.Coordinator()
             threads = tf.train.start_queue_runners(coord=coord)
             images, labels = sess.run([imgs, lbls])
             coord.request_stop()
             coord.join(threads)
-            print(imgs.shape)
-            print(labels.shape)
-        return imgs, labels
+        return images, labels
 
     def _load_tfrecords(self):
         tfrecords = os.listdir(self.tfrecord_path)
