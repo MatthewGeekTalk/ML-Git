@@ -187,7 +187,7 @@ if __name__ == '__main__':
         init_op = tf.group(tf.local_variables_initializer(), tf.global_variables_initializer())
         # init_op = tf.global_variables_initializer()
         sess.run(init_op)
-        for i in range(20000):
+        for i in range(1000):
             imgs, labels = reader.main(batch=BATCH_SIZE)
             imgs = np.reshape(imgs, [BATCH_SIZE, 20 * 70 * 3])
             labels = np.reshape(labels, [BATCH_SIZE, 1])
