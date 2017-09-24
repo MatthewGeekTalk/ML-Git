@@ -1,5 +1,8 @@
 import tensorflow as tf
 import os
+import matplotlib.pyplot as plt
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 
 class tfrecords_reader:
@@ -40,16 +43,21 @@ class tfrecords_reader:
         image = tf.decode_raw(features['train/image'], tf.uint8)
         label = tf.cast(features['train/label'], tf.int32)
         image = tf.reshape(image, [20, 70, 3])
+        images, labels = tf.train.shuffle_batch([image, label],
+                                                batch_size=batch,
+                                                num_threads=4,
+                                                capacity=50000,
+                                                min_after_dequeue=10000)
         # images, labels = tf.train.shuffle_batch([image, label],
         #                                        batch_size=batch,
         #                                        capacity=30,
         #                                        num_threads=1,
         #                                        min_after_dequeue=10)
-        images, labels = tf.train.batch([image, label],
-                                        batch_size=batch,
-                                        capacity=32,
-                                        enqueue_many=False,
-                                        num_threads=1)
+        # images, labels = tf.train.batch([image, label],
+        #                                 batch_size=batch,
+        #                                 capacity=32,
+        #                                 enqueue_many=False,
+        #                                 num_threads=1)
 
         return images, labels
 
@@ -71,4 +79,5 @@ if __name__ == '__main__':
     path = os.path.abspath('../TFRecords')
     reader = tfrecords_reader(path)
     imgs, labels = reader.main(50)
-
+    plt.imshow(imgs[2])
+    plt.show()
