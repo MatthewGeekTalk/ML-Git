@@ -177,6 +177,9 @@ if __name__ == '__main__':
     path = os.path.abspath('./TFRecords')
     reader = tfrecords_reader(path)
 
+    MODEL_PATH = os.path.abspath('./net_structure/binary_classification_CNN.ckpt')
+    saver = tf.train.Saver()
+
     # config = tf.ConfigProto()
     # config.gpu_options.allow_growth = True
     # with tf.Session(config=config) as sess:
@@ -192,3 +195,5 @@ if __name__ == '__main__':
                 train_accuracy = accuracy.eval(feed_dict={x: imgs, y_: labels, keep_prob: 1.0})
                 print('step %d, training accuracy %g' % (i, train_accuracy))
             train_step.run(feed_dict={x: imgs, y_: labels, keep_prob: 0.5})
+        save_path = saver.save(sess, MODEL_PATH)
+        print('Model save at %s' % save_path)
