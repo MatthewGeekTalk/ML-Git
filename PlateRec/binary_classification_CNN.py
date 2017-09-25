@@ -8,7 +8,7 @@ sys.path.append(os.path.abspath('./tool/'))
 from tfrecords_reader import tfrecords_reader
 
 BATCH_SIZE = 50
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+# os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 
 class deepcnn:
