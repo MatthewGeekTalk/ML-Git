@@ -8,7 +8,7 @@ sys.path.append(os.path.abspath('./tool/'))
 from tfrecords_reader import tfrecords_reader
 
 BATCH_SIZE = 50
-# os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 
 class deepcnn:
@@ -174,7 +174,8 @@ if __name__ == '__main__':
     # train_writer = tf.summary.FileWriter(graph_location)
     # train_writer.add_graph(tf.get_default_graph())
 
-    path = os.path.abspath('./TFRecords')
+    # path = os.path.abspath('./TFRecords')
+    path = os.path.abspath('/nfs/users/matthew/workdir')
     reader = tfrecords_reader(path)
 
     # MODEL_PATH = os.path.abspath('./net_structure/binary_classification_CNN.ckpt')
@@ -189,11 +190,11 @@ if __name__ == '__main__':
         init_op = tf.group(tf.local_variables_initializer(), tf.global_variables_initializer())
         # init_op = tf.global_variables_initializer()
         sess.run(init_op)
-        for i in range(20000):
+        for i in range(200):
             imgs, labels = reader.main(batch=BATCH_SIZE)
             imgs = np.reshape(imgs, [BATCH_SIZE, 20 * 70 * 3])
             labels = np.reshape(labels, [BATCH_SIZE, 1])
-            if i % 50 == 0:
+            if i % 2 == 0:
                 train_accuracy = accuracy.eval(feed_dict={x: imgs, y_: labels, keep_prob: 1.0})
                 print('step %d, training accuracy %g' % (i, train_accuracy))
             train_step.run(feed_dict={x: imgs, y_: labels, keep_prob: 0.5})
