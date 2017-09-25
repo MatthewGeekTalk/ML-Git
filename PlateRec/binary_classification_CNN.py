@@ -11,7 +11,7 @@ BATCH_SIZE = 50
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 
-class deepcnn:
+class deepcnn(object):
     def __init__(self, x):
         self.x = tf.reshape(x, [-1, 20, 70, 3])
         self.conv1_name = ""
