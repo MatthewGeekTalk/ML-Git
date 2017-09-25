@@ -177,7 +177,9 @@ if __name__ == '__main__':
     path = os.path.abspath('./TFRecords')
     reader = tfrecords_reader(path)
 
-    MODEL_PATH = os.path.abspath('./net_structure/binary_classification_CNN.ckpt')
+    # MODEL_PATH = os.path.abspath('./net_structure/binary_classification_CNN.ckpt')
+    # path at sap gpu server
+    MODEL_PATH = '/nfs/users/matthew/saved_model'
     saver = tf.train.Saver()
 
     # config = tf.ConfigProto()
