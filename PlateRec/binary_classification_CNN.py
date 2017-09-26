@@ -78,12 +78,12 @@ class deepcnn(object):
     @staticmethod
     def _weight_variable(shape):
         initial = tf.truncated_normal(shape, stddev=0.1)
-        return tf.Variable(initial)
+        return tf.Variable(initial, dtype=tf.float32)
 
     @staticmethod
     def _bias_variable(shape):
         initial = tf.constant(0.1, shape=shape)
-        return tf.Variable(initial)
+        return tf.Variable(initial, dtype=tf.float32)
 
     @staticmethod
     def _conv2d(x, W):
@@ -125,7 +125,7 @@ class deepcnn(object):
             W_output = self._weight_variable(weight_shape)
             b_output = self._bias_variable(bias_shape)
 
-            y_conv = tf.matmul(x, W_output) + b_output
+            y_conv = tf.add(tf.matmul(x, W_output), b_output, name='predict')
             return y_conv
 
     def build_cnn(self):
@@ -135,7 +135,7 @@ class deepcnn(object):
         h_pool2 = self._build_pool(self.pool2_name, h_conv2, 2, 2)
         h_dense = self._build_dense(self.dense_name, self.dense_weight_shape, self.dense_bias_shape, h_pool2)
         h_dense_drop = self._build_dropout(self.dropout_name, h_dense, self.keep_prob)
-        y_conv = self._build_dense(self.output_name, self.output_weight_shape, self.output_bias_shape, h_dense_drop)
+        y_conv = self._build_output(self.output_name, self.output_weight_shape, self.output_bias_shape, h_dense_drop)
         return y_conv
 
 
