@@ -79,12 +79,12 @@ class deepcnn(object):
     @staticmethod
     def _weight_variable(shape):
         initial = tf.truncated_normal(shape, stddev=0.1)
-        return tf.Variable(initial, dtype=tf.float32)
+        return tf.Variable(initial, dtype=tf.float32,name='weight')
 
     @staticmethod
     def _bias_variable(shape):
         initial = tf.constant(0.1, shape=shape)
-        return tf.Variable(initial, dtype=tf.float32)
+        return tf.Variable(initial, dtype=tf.float32,name='bias')
 
     @staticmethod
     def _conv2d(x, W):
@@ -141,9 +141,9 @@ class deepcnn(object):
 
 
 if __name__ == '__main__':
-    x = tf.placeholder(tf.float32, [None, 20 * 70 * 3])
-    y_ = tf.placeholder(tf.float32, [None, 1])
-    keep_prob = tf.placeholder(tf.float32)
+    x = tf.placeholder(tf.float32, [None, 20 * 70 * 3],name='x')
+    y_ = tf.placeholder(tf.float32, [None, 1], name='y_')
+    keep_prob = tf.placeholder(tf.float32,name='keep_prob')
 
     cnn = deepcnn(x)
 
