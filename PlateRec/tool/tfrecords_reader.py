@@ -30,7 +30,7 @@ class tfrecords_reader:
     def _load_tfrecords(self):
         tfrecords = os.listdir(self.tfrecord_path)
         # data_path = self.tfrecord_path + os.path.sep + tfrecords[0]
-        data_path = self.tfrecord_path + os.path.sep + 'plates.tfrecords'
+        data_path = self.tfrecord_path + os.path.sep + 'plates.tfrecords1'
         filename_queue = tf.train.string_input_producer([data_path], num_epochs=1, name='queue')
         reader = tf.TFRecordReader()
         _, serialized_example = reader.read(filename_queue)
@@ -44,6 +44,7 @@ class tfrecords_reader:
         image = tf.decode_raw(features['train/image'], tf.uint8)
         label = tf.cast(features['train/label'], tf.int32)
         image = tf.reshape(image, [20, 70, 3])
+        print(image,label)
         images, labels = tf.train.shuffle_batch([image, label],
                                                 batch_size=batch,
                                                 num_threads=4,
