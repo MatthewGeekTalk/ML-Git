@@ -32,7 +32,7 @@ class tfrecords_builder:
         return imgs, labels
 
     def _build_tfrecords(self, imgs, labels):
-        file_name = self.TFRECORDS_ADDR + os.path.sep + 'plates.tfrecords1'
+        file_name = self.TFRECORDS_ADDR + os.path.sep + 'plates1.tfrecords'
 
         writer = tf.python_io.TFRecordWriter(file_name)
         labels = np.asarray(labels, dtype=np.int64)
