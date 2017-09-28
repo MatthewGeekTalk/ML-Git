@@ -20,27 +20,22 @@ class tfrecords_builder:
             path = self.PLATES_ADDR + os.path.sep + str(plates[i])
             img = self._get_img(path)
             imgs.append(img)
-            # labels.astype(np.uint8)
             labels.append(self.IS_PLATE)
         non_plates = os.listdir(self.NON_PLATES_ADDR)
         for i in range(len(non_plates)):
             path = self.NON_PLATES_ADDR + os.path.sep + str(non_plates[i])
             img = self._get_img(path)
             imgs.append(img)
-            # labels.astype(np.uint8)
             labels.append(self.NOT_PLATE)
         return imgs, labels
 
     def _build_tfrecords(self, imgs, labels):
-        file_name = self.TFRECORDS_ADDR + os.path.sep + 'plates1.tfrecords'
+        file_name = self.TFRECORDS_ADDR + os.path.sep + 'plates.tfrecords'
 
         writer = tf.python_io.TFRecordWriter(file_name)
         labels = np.asarray(labels, dtype=np.int64)
 
         for i in range(len(imgs)):
-            # print(imgs)
-            print(i)
-            # feature = {'train/label': self._int64_feature(labels[i]),
             feature = {'train/label': self._int64_feature(labels[i]),
                        'train/image': self._bytes_feature(tf.compat.as_bytes(imgs[i].tostring()))}
             example = tf.train.Example(features=tf.train.Features(feature=feature))

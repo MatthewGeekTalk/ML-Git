@@ -30,7 +30,7 @@ class tfrecords_reader:
     def _load_tfrecords(self):
         tfrecords = os.listdir(self.tfrecord_path)
         # data_path = self.tfrecord_path + os.path.sep + tfrecords[0]
-        data_path = self.tfrecord_path + os.path.sep + 'plates1.tfrecords'
+        data_path = self.tfrecord_path + os.path.sep + 'plates.tfrecords'
         filename_queue = tf.train.string_input_producer([data_path], num_epochs=1, name='queue')
         reader = tf.TFRecordReader()
         _, serialized_example = reader.read(filename_queue)
