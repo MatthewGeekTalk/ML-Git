@@ -88,24 +88,24 @@ class deepcnn(object):
 
     @staticmethod
     def _conv2d(x, W):
-        return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
+        return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME',name='conv2d')
 
     @staticmethod
     def _max_pool(x, width, height):
         return tf.nn.max_pool(x, ksize=[1, width, height, 1],
-                              strides=[1, width, height, 1], padding='SAME')
+                              strides=[1, width, height, 1], padding='SAME',name='max_pool')
 
     @staticmethod
     def _build_dropout(name, x, keep_prob):
         with tf.name_scope(name=name):
-            h_dense_drop = tf.nn.dropout(x, keep_prob)
+            h_dense_drop = tf.nn.dropout(x, keep_prob,name='dense_drop')
             return h_dense_drop
 
     def _build_conv(self, name, weight_shape, bias_shape, x):
         with tf.name_scope(name=name):
             W_conv1 = self._weight_variable(weight_shape)
             b_conv1 = self._bias_variable(bias_shape)
-            h_conv1 = tf.nn.relu(self._conv2d(x, W_conv1) + b_conv1)
+            h_conv1 = tf.nn.relu(self._conv2d(x, W_conv1) + b_conv1,name='conv_relu')
             return h_conv1
 
     def _build_pool(self, name, conv, width, height):
@@ -117,8 +117,8 @@ class deepcnn(object):
         with tf.name_scope(name=name):
             W_dense = self._weight_variable(weight_shape)
             b_dense = self._bias_variable(bias_shape)
-            h_pool2_flat = tf.reshape(x, [-1, weight_shape[0]])
-            h_dense = tf.nn.relu(tf.matmul(h_pool2_flat, W_dense) + b_dense)
+            h_pool2_flat = tf.reshape(x, [-1, weight_shape[0]],name='pool2_flat')
+            h_dense = tf.nn.relu(tf.matmul(h_pool2_flat, W_dense) + b_dense, name='dense_relu')
             return h_dense
 
     def _build_output(self, name, weight_shape, bias_shape, x):
@@ -168,7 +168,7 @@ if __name__ == '__main__':
         correct_prediction = tf.equal(tf.argmax(y_conv, 1), tf.argmax(y_, 1))
         correct_prediction = tf.cast(correct_prediction, tf.float32)
 
-    accuracy = tf.reduce_mean(correct_prediction)
+    accuracy = tf.reduce_mean(correct_prediction, name='accuracy_1')
 
     # graph_location = tempfile.mkdtemp()
     # print('Saving  graph to: %s' % graph_location)
@@ -199,5 +199,7 @@ if __name__ == '__main__':
                 train_accuracy = accuracy.eval(feed_dict={x: imgs, y_: labels, keep_prob: 1.0})
                 print('step %d, training accuracy %g' % (i, train_accuracy))
             train_step.run(feed_dict={x: imgs, y_: labels, keep_prob: 0.5})
+        writer = tf.summary.FileWriter("/nfs/users/matthew/saved_model", sess.graph)
+        writer.close()
         save_path = saver.save(sess, MODEL_PATH)
         print('Model save at %s' % save_path)
