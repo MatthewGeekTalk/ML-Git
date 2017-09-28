@@ -127,6 +127,7 @@ class deepcnn(object):
             b_output = self._bias_variable(bias_shape)
 
             y_conv = tf.add(tf.matmul(x, W_output), b_output, name='predict')
+            y_conv_sm = tf.nn.softmax(y_conv, name='predict_sm')
             return y_conv
 
     def build_cnn(self):
