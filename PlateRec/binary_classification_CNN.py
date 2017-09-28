@@ -143,7 +143,7 @@ class deepcnn(object):
 
 if __name__ == '__main__':
     x = tf.placeholder(tf.float32, [None, 20 * 70 * 3], name='x')
-    y_ = tf.placeholder(tf.float32, [None, 1], name='y_')
+    y_ = tf.placeholder(tf.float32, [None, 2], name='y_')
     keep_prob = tf.placeholder(tf.float32, name='keep_prob')
 
     cnn = deepcnn(x)
@@ -153,7 +153,7 @@ if __name__ == '__main__':
     cnn.set_conv1_shape([5, 5, 3, 32], [32])
     cnn.set_conv2_shape([5, 5, 32, 64], [64])
     cnn.set_dense_shape([5 * 18 * 64, 1024], [1024])
-    cnn.set_output_shape([1024, 1], [1])
+    cnn.set_output_shape([1024, 2], [2])
     cnn.set_keep_prob(keep_prob)
     y_conv = cnn.build_cnn()
 
