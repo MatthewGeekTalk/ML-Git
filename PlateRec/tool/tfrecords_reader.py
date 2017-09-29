@@ -7,8 +7,8 @@ os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 class tfrecords_reader:
     def __init__(self, path):
-        self.imgs = []
-        self.labels = []
+        # self.imgs = []
+        # self.labels = []
         self.tfrecord_path = path
 
     def main(self, batch):
@@ -17,9 +17,9 @@ class tfrecords_reader:
         # return self._read_data(imgs, labels)
         imgs, lbls = self._get_data_label(features, batch)
         with tf.Session() as sess:
-            init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
+            # init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
             # init_op = tf.global_variables_initializer()
-            sess.run(init_op)
+            # sess.run(init_op)
             coord = tf.train.Coordinator()
             threads = tf.train.start_queue_runners(coord=coord)
             images, labels = sess.run([imgs, lbls])
