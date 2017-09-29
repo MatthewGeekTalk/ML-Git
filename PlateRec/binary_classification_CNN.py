@@ -194,6 +194,7 @@ if __name__ == '__main__':
         sess.run(init_op)
         for i in range(44):
             imgs, labels = reader.main(batch=BATCH_SIZE)
+            imgs, labels = sess.run([imgs, labels])
             imgs = np.reshape(imgs, [BATCH_SIZE, 20 * 70 * 3])
             labels = np.reshape(labels, [BATCH_SIZE, 2])
             if i % 2 == 0:

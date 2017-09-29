@@ -36,6 +36,7 @@ class tfrecords_builder:
         labels = np.asarray(labels, dtype=np.int64)
 
         for i in range(len(imgs)):
+            print(i)
             feature = {'train/label': self._int64_feature(labels[i]),
                        'train/image': self._bytes_feature(tf.compat.as_bytes(imgs[i].tostring()))}
             example = tf.train.Example(features=tf.train.Features(feature=feature))
