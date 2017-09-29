@@ -192,6 +192,10 @@ if __name__ == '__main__':
         init_op = tf.group(tf.local_variables_initializer(), tf.global_variables_initializer())
         # init_op = tf.global_variables_initializer()
         sess.run(init_op)
+        coord = tf.train.Coordinator()
+        threads = tf.train.start_queue_runners(coord=coord)
+        coord.request_stop()
+        coord.join(threads)
         for i in range(44):
             imgs, labels = reader.main(batch=BATCH_SIZE)
             imgs, labels = sess.run([imgs, labels])
