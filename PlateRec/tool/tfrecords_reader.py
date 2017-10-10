@@ -31,7 +31,6 @@ class tfrecords_reader:
         dataset = dataset.batch(batch)
         iterator = dataset.make_one_shot_iterator()
         image_batch, label_batch  = iterator.get_next()
-        print(image_batch,label_batch)
         # imgs, lbls = self._get_data_label(features, batch)
         with tf.Session() as sess:
             init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
