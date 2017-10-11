@@ -3,7 +3,6 @@ import numpy as np
 import math
 import os
 
-
 class charsSegment:
     def __init__(self):
         self.rect = []
