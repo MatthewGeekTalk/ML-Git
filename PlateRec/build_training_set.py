@@ -27,7 +27,6 @@ for i in range(len(materials)):
     for j in range(len(plates)):
         cv2.imwrite(set_path + 'plate' + str(i) + '_' + str(j) + '.jpg', plates[j])
 
-
 # plates = []
 # materials = os.listdir(os.path.abspath('../Test_img'))
 #
