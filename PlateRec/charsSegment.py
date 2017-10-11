@@ -37,7 +37,6 @@ class charsSegment:
             ret, img_thre = cv2.threshold(src, 0, 255, cv2.THRESH_OTSU + cv2.THRESH_BINARY)
         return img_thre
 
-
 if __name__ == '__main__':
     charsSegment = charsSegment()
     img = charsSegment.read_img('000_1.jpg')
