@@ -23,10 +23,29 @@ class charsSegment:
             if area <= 50:
                 continue
             x, y, w, h = cv2.boundingRect(cnt)
-            print(x,y,w,h)
-            img = cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0))
-            cv2.imshow('plates_' + str(i), img)
+            if w > 0 and h > 0 and w < h:
+                print(x,y,w,h)
+                rect = ((x + (w / 2), y + (h / 2)), (w, h), 0)
+                box = cv2.boxPoints(rect)
+                box = np.int0(box)
+                height = abs(box[0][1] - box[2][1])
+                width = abs(box[0][0] - box[2][0])
+                # img1 = cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0))
+                # cv2.imshow('plates_' + str(i), img1)
         cv2.waitKey(0)
+
+    def verifyCharSizes(self,height,width):
+        aspect = 0.5
+        charAspect = width / height
+        error = 0.7
+        minHeight = 10
+        maxHeight = 35
+        # We have a different aspect ratio for number 1, and it can be ~0.2
+        minAspect = 0.05
+        maxAspect = aspect + aspect * error
+        cv2.countNonZero()
+        return img_thre
+
     def spatial_ostu(self,src,color):
         if color == 'BLUE':
             ret,img_thre = cv2.threshold(src, 0, 255, cv2.THRESH_OTSU + cv2.THRESH_BINARY)
