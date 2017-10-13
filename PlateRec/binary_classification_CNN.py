@@ -185,7 +185,6 @@ if __name__ == '__main__':
     MODEL_PATH = '/nfs/users/matthew/saved_model/binary_classification_CNN.ckpt'
     saver = tf.train.Saver()
 
-
     # config = tf.ConfigProto()
     # config.gpu_options.allow_growth = True
     # with tf.Session(config=config) as sess:
