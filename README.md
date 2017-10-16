@@ -54,4 +54,5 @@ Here is Dr. Wu’s git, you could find all materials and code:
 https://github.com/G-wave
 
 Active Pycharm
-http://idea.irfen.me/ 
+http://idea.irfen.me/
+http://xidea.online/?/ideas(http://xidea.online)
