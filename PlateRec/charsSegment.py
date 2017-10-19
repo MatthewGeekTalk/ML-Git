@@ -11,6 +11,7 @@ class charsSegment:
         return self.img
 
     def charsSegment(self,img,color):
+        chars = []
         img_gay = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         img_threshold = self.spatial_ostu(img_gay,color)
         im2, contours, hierarchy = cv2.findContours(img_threshold, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
@@ -42,11 +43,19 @@ class charsSegment:
                 y2 = box[ys_sorted_index[3], 1]
                 img_plate = img_threshold[y1:y2, x1:x2]
                 result = self.verifyCharSizes(img_plate,height,width)
+                if img_plate.shape[0] != 0 and img_plate.shape[1] != 0:
+                    if img_plate.shape[0] / img_plate.shape[1] > 2:
+                        left = np.int0(img_plate.shape[1] * 0.5)
+                        right = np.int0(img_plate.shape[1] * 0.5)
+                        img_plate = cv2.copyMakeBorder(img_plate, 0, 0, left, right, cv2.BORDER_CONSTANT, value=[0, 0, 0])
+                    img_plate = cv2.resize(img_plate, (28, 28), interpolation=cv2.INTER_CUBIC)
                 if result == True:
-                    cv2.imshow('plates_' + str(i), img_plate)
+                    chars.append(img_plate)
+                    # cv2.imshow('plates_' + str(i), img_plate)
                 # img1 = cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0))
                 # cv2.imshow('plates1_' + str(i), img1)
-        cv2.waitKey(0)
+        # cv2.waitKey(0)
+        return chars
 
     def verifyCharSizes(self,img,height,width):
         aspect = 0.5
@@ -77,7 +86,10 @@ class charsSegment:
             ret, img_thre = cv2.threshold(src, 0, 255, cv2.THRESH_OTSU + cv2.THRESH_BINARY)
         return img_thre
 
-if __name__ == '__main__':
-    charsSegment = charsSegment()
-    img = charsSegment.read_img('00_1.jpg')
-    charsSegment.charsSegment(img,'BLUE')
+# if __name__ == '__main__':
+#     charsSegment = charsSegment()
+#     img = charsSegment.read_img('000_1.jpg')
+#     chars = charsSegment.charsSegment(img,'BLUE')
+# for i in range(len(chars)):
+#     cv2.imshow('plates_' + str(i), chars[i])
+# cv2.waitKey(0)
