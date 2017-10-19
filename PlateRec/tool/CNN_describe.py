@@ -5,8 +5,6 @@ import matplotlib.pyplot as plt
 import cv2
 import tensorflow as tf
 
-FEATURES = []
-
 if __name__ == '__main__':
     dir(tf.contrib)
     img = mpimg.imread(os.path.abspath('../0.jpg'))
