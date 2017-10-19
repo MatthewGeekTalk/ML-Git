@@ -56,3 +56,7 @@ https://github.com/G-wave
 Active Pycharm
 http://idea.irfen.me/
 http://xidea.online/?/ideas(http://xidea.online)
+
+Wiki
+https://wiki.wdf.sap.corp/wiki/display/design/2017+Machine+Learn+Meeting
+
