@@ -36,7 +36,7 @@ def ocr_cnn(images, keep_prob):
     # 3 * 21 * 192
     with tf.name_scope('conv3') as scope:
         kernel = tf.Variable(tf.truncated_normal([3, 3, 192, 384], dtype=tf.float32, stddev=1e-1), name='weights')
-        conv = tf.nn.conv2d(pool1, kernel, [1, 1, 1, 1], padding='SAME')
+        conv = tf.nn.conv2d(pool2, kernel, [1, 1, 1, 1], padding='SAME')
         biases = tf.Variable(tf.constant(.0, shape=[384]), dtype='biases')
         bias = tf.nn.bias_add(conv, biases)
         conv3 = tf.nn.relu(bias, name='relu')
