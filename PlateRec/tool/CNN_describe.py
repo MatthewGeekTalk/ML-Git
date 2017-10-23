@@ -12,8 +12,8 @@ if __name__ == '__main__':
     img = np.reshape(img, (-1, 4200))
 
     with tf.Session() as sess:
-        saver = tf.train.import_meta_graph('../../Test/bc-cnn2/binary_classification_CNN.ckpt.meta')
-        saver.restore(sess, '../../Test/bc-cnn2/binary_classification_CNN.ckpt')
+        saver = tf.train.import_meta_graph('../module/bc-cnn2/binary_classification_CNN.ckpt.meta')
+        saver.restore(sess, '../module/bc-cnn2/binary_classification_CNN.ckpt')
         graph = tf.get_default_graph()
         x = graph.get_tensor_by_name('x:0')
         conv1 = graph.get_tensor_by_name('conv1/conv_relu:0')
