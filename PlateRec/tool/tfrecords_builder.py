@@ -3,7 +3,6 @@ import tensorflow as tf
 import cv2
 import os
 
-
 class tfrecords_builder:
     def __init__(self):
         self.PLATES_ADDR = os.path.abspath('../../Plates/4')
@@ -67,3 +66,4 @@ class tfrecords_builder:
 if __name__ == '__main__':
     builder = tfrecords_builder()
     builder.main()
+
