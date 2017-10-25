@@ -1,161 +1,259 @@
-# -*- coding: utf-8 -*-
-import os
-import cv2
+# Copyright 2015 The TensorFlow Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
+
+"""Timing benchmark for AlexNet inference.
+
+To run, use:
+  bazel run -c opt --config=cuda \
+      models/tutorials/image/alexnet:alexnet_benchmark
+
+Across 100 steps on batch size = 128.
+
+Forward pass:
+Run on Tesla K40c: 145 +/- 1.5 ms / batch
+Run on Titan X:     70 +/- 0.1 ms / batch
+
+Forward-backward pass:
+Run on Tesla K40c: 480 +/- 48 ms / batch
+Run on Titan X:    244 +/- 30 ms / batch
+"""
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+import argparse
+from datetime import datetime
 import math
-import numpy as np
+import sys
+import time
+
+from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 
-NUM_CLASSES = 1000
-IMAGE_SIZE = 224
-IMAGE_PIXELS = IMAGE_SIZE * IMAGE_SIZE * 3
-
-flags = tf.app.flags
-FLAGS = flags.FLAGS
-flags.DEFINE_string('log_dir', 'log', 'Directory to save tensorboard logs')
-flags.DEFINE_integer('max_steps', 1000, 'Number of steps to run trainer.')
-flags.DEFINE_integer('batch_size', 10, 'Must divide evenly into the dataset sizes.')
-flags.DEFINE_float('learning_rate', 1e-2, 'Initial learning rate.')
+FLAGS = None
 
 
-def inference(images_placeholder, keep_prob):
-    def weight_variable(shape, num):
-        initial = tf.truncated_normal(shape, stddev=1.0 / math.sqrt(float(num)))
-        return (tf.Variable(initial).initialized_value())
-
-    def bias_variable(shape):
-        initial = tf.zeros(shape)
-        return (tf.Variable(initial).initialized_value())
-
-    def conv2d(x, W):
-        return (tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME'))
-
-    def max_pool_3x3(x):
-        return (tf.nn.max_pool(x, ksize=[1, 3, 3, 1], strides=[1, 2, 2, 1], padding='SAME'))
-
-    x_image = tf.reshape(images_placeholder, [-1, IMAGE_SIZE, IMAGE_SIZE, 3])
-
-    with tf.name_scope('conv1') as scope:
-        W_conv1 = weight_variable([11, 11, 3, 96], IMAGE_SIZE * IMAGE_SIZE)
-        b_conv1 = bias_variable([96])
-        h_conv1 = tf.nn.relu(tf.nn.conv2d(x_image, W_conv1, strides=[1, 4, 4, 1], padding='SAME') + b_conv1)
-
-    with tf.name_scope('pool1') as scope:
-        h_pool1 = max_pool_3x3(tf.nn.local_response_normalization(h_conv1))
-
-    with tf.name_scope('conv2') as scope:
-        W_conv2 = weight_variable([5, 5, 96, 256], 96)
-        b_conv2 = bias_variable([256])
-        h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
-
-    with tf.name_scope('pool2') as scope:
-        h_pool2 = max_pool_3x3(tf.nn.local_response_normalization(h_conv2))
-
-    with tf.name_scope('conv3') as scope:
-        W_conv3 = weight_variable([3, 3, 256, 384], 256)
-        b_conv3 = bias_variable([384])
-        h_conv3 = tf.nn.relu(conv2d(h_pool2, W_conv3) + b_conv3)
-
-    with tf.name_scope('conv4') as scope:
-        W_conv4 = weight_variable([3, 3, 384, 384], 384)
-        b_conv4 = bias_variable([384])
-        h_conv4 = tf.nn.relu(conv2d(h_conv3, W_conv4) + b_conv4)
-
-    with tf.name_scope('conv5') as scope:
-        W_conv5 = weight_variable([3, 3, 384, 256], 384)
-        b_conv5 = bias_variable([256])
-        h_conv5 = tf.nn.relu(conv2d(h_conv4, W_conv5) + b_conv5)
-
-    with tf.name_scope('pool3') as scope:
-        h_pool3 = max_pool_3x3(h_conv5)
-
-    with tf.name_scope('fc1') as scope:
-        W_fc1 = weight_variable([7 * 7 * 256, 4096], (7 * 7 * 256))
-        b_fc1 = bias_variable([4096])
-        h_pool3_flat = tf.reshape(h_pool3, [-1, 7 * 7 * 256])
-        h_fc1 = tf.nn.relu(tf.matmul(h_pool3_flat, W_fc1) + b_fc1)
-
-        h_fc1_drop = tf.nn.dropout(h_fc1, keep_prob)
-
-    with tf.name_scope('fc2') as scope:
-        W_fc2 = weight_variable([4096, 4096], 4096)
-        b_fc2 = bias_variable([4096])
-        h_fc2 = tf.nn.relu(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
-
-        h_fc2_drop = tf.nn.dropout(h_fc2, keep_prob)
-
-    with tf.name_scope('fc3') as scope:
-        W_fc3 = weight_variable([4096, NUM_CLASSES], 4096)
-        b_fc3 = bias_variable([NUM_CLASSES])
-
-        y_conv = tf.matmul(h_fc2_drop, W_fc3) + b_fc3
-
-    with tf.name_scope('softmax') as scope:
-        y_conv = tf.nn.softmax(tf.matmul(h_fc2_drop, W_fc3) + b_fc3)
-
-    return (y_conv)
+def print_activations(t):
+  print(t.op.name, ' ', t.get_shape().as_list())
 
 
-def loss(logits, labels):
-    cross_entropy = tf.reduce_mean(-tf.reduce_sum(labels * tf.log(tf.nn.softmax(logits))))
-    tf.summary.scalar('cross_entropy', cross_entropy)
-    return (cross_entropy)
+def inference(images):
+  """Build the AlexNet model.
+
+  Args:
+    images: Images Tensor
+
+  Returns:
+    pool5: the last Tensor in the convolutional component of AlexNet.
+    parameters: a list of Tensors corresponding to the weights and biases of the
+        AlexNet model.
+  """
+  parameters = []
+  # conv1
+  with tf.name_scope('conv1') as scope:
+    kernel = tf.Variable(tf.truncated_normal([11, 11, 3, 64], dtype=tf.float32,
+                                             stddev=1e-1), name='weights')
+    conv = tf.nn.conv2d(images, kernel, [1, 4, 4, 1], padding='SAME')
+    biases = tf.Variable(tf.constant(0.0, shape=[64], dtype=tf.float32),
+                         trainable=True, name='biases')
+    bias = tf.nn.bias_add(conv, biases)
+    conv1 = tf.nn.relu(bias, name=scope)
+    print_activations(conv1)
+    parameters += [kernel, biases]
+
+  # lrn1
+  with tf.name_scope('lrn1') as scope:
+    lrn1 = tf.nn.local_response_normalization(conv1,
+                                              alpha=1e-4,
+                                              beta=0.75,
+                                              depth_radius=2,
+                                              bias=2.0)
+
+  # pool1
+  pool1 = tf.nn.max_pool(lrn1,
+                         ksize=[1, 3, 3, 1],
+                         strides=[1, 2, 2, 1],
+                         padding='VALID',
+                         name='pool1')
+  print_activations(pool1)
+
+  # conv2
+  with tf.name_scope('conv2') as scope:
+    kernel = tf.Variable(tf.truncated_normal([5, 5, 64, 192], dtype=tf.float32,
+                                             stddev=1e-1), name='weights')
+    conv = tf.nn.conv2d(pool1, kernel, [1, 1, 1, 1], padding='SAME')
+    biases = tf.Variable(tf.constant(0.0, shape=[192], dtype=tf.float32),
+                         trainable=True, name='biases')
+    bias = tf.nn.bias_add(conv, biases)
+    conv2 = tf.nn.relu(bias, name=scope)
+    parameters += [kernel, biases]
+  print_activations(conv2)
+
+  # lrn2
+  with tf.name_scope('lrn2') as scope:
+    lrn2 = tf.nn.local_response_normalization(conv2,
+                                              alpha=1e-4,
+                                              beta=0.75,
+                                              depth_radius=2,
+                                              bias=2.0)
+
+  # pool2
+  pool2 = tf.nn.max_pool(lrn2,
+                         ksize=[1, 3, 3, 1],
+                         strides=[1, 2, 2, 1],
+                         padding='VALID',
+                         name='pool2')
+  print_activations(pool2)
+
+  # conv3
+  with tf.name_scope('conv3') as scope:
+    kernel = tf.Variable(tf.truncated_normal([3, 3, 192, 384],
+                                             dtype=tf.float32,
+                                             stddev=1e-1), name='weights')
+    conv = tf.nn.conv2d(pool2, kernel, [1, 1, 1, 1], padding='SAME')
+    biases = tf.Variable(tf.constant(0.0, shape=[384], dtype=tf.float32),
+                         trainable=True, name='biases')
+    bias = tf.nn.bias_add(conv, biases)
+    conv3 = tf.nn.relu(bias, name=scope)
+    parameters += [kernel, biases]
+    print_activations(conv3)
+
+  # conv4
+  with tf.name_scope('conv4') as scope:
+    kernel = tf.Variable(tf.truncated_normal([3, 3, 384, 256],
+                                             dtype=tf.float32,
+                                             stddev=1e-1), name='weights')
+    conv = tf.nn.conv2d(conv3, kernel, [1, 1, 1, 1], padding='SAME')
+    biases = tf.Variable(tf.constant(0.0, shape=[256], dtype=tf.float32),
+                         trainable=True, name='biases')
+    bias = tf.nn.bias_add(conv, biases)
+    conv4 = tf.nn.relu(bias, name=scope)
+    parameters += [kernel, biases]
+    print_activations(conv4)
+
+  # conv5
+  with tf.name_scope('conv5') as scope:
+    kernel = tf.Variable(tf.truncated_normal([3, 3, 256, 256],
+                                             dtype=tf.float32,
+                                             stddev=1e-1), name='weights')
+    conv = tf.nn.conv2d(conv4, kernel, [1, 1, 1, 1], padding='SAME')
+    biases = tf.Variable(tf.constant(0.0, shape=[256], dtype=tf.float32),
+                         trainable=True, name='biases')
+    bias = tf.nn.bias_add(conv, biases)
+    conv5 = tf.nn.relu(bias, name=scope)
+    parameters += [kernel, biases]
+    print_activations(conv5)
+
+  # pool5
+  pool5 = tf.nn.max_pool(conv5,
+                         ksize=[1, 3, 3, 1],
+                         strides=[1, 2, 2, 1],
+                         padding='VALID',
+                         name='pool5')
+  print_activations(pool5)
+
+  return pool5, parameters
 
 
-def training(loss, learning_rate):
-    train_step = tf.train.AdamOptimizer(learning_rate).minimize(loss)
-    return (train_step)
+def time_tensorflow_run(session, target, info_string):
+  """Run the computation to obtain the target tensor and print timing stats.
+
+  Args:
+    session: the TensorFlow session to run the computation under.
+    target: the target Tensor that is passed to the session's run() function.
+    info_string: a string summarizing this run, to be printed with the stats.
+
+  Returns:
+    None
+  """
+  num_steps_burn_in = 10
+  total_duration = 0.0
+  total_duration_squared = 0.0
+  for i in xrange(FLAGS.num_batches + num_steps_burn_in):
+    start_time = time.time()
+    _ = session.run(target)
+    duration = time.time() - start_time
+    if i >= num_steps_burn_in:
+      if not i % 10:
+        print ('%s: step %d, duration = %.3f' %
+               (datetime.now(), i - num_steps_burn_in, duration))
+      total_duration += duration
+      total_duration_squared += duration * duration
+  mn = total_duration / FLAGS.num_batches
+  vr = total_duration_squared / FLAGS.num_batches - mn * mn
+  sd = math.sqrt(vr)
+  print ('%s: %s across %d steps, %.3f +/- %.3f sec / batch' %
+         (datetime.now(), info_string, FLAGS.num_batches, mn, sd))
 
 
-def accuracy(logits, labels):
-    correct_prediction = tf.equal(tf.argmax(logits, 1), tf.argmax(labels, 1))
-    accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
-    tf.summary.scalar('accuracy', accuracy)
-    return (accuracy)
+
+def run_benchmark():
+  """Run the benchmark on AlexNet."""
+  with tf.Graph().as_default():
+    # Generate some dummy images.
+    image_size = 224
+    # Note that our padding definition is slightly different the cuda-convnet.
+    # In order to force the model to start with the same activations sizes,
+    # we add 3 to the image_size and employ VALID padding above.
+    images = tf.Variable(tf.random_normal([FLAGS.batch_size,
+                                           image_size,
+                                           image_size, 3],
+                                          dtype=tf.float32,
+                                          stddev=1e-1))
+
+    # Build a Graph that computes the logits predictions from the
+    # inference model.
+    pool5, parameters = inference(images)
+
+    # Build an initialization operation.
+    init = tf.global_variables_initializer()
+
+    # Start running operations on the Graph.
+    config = tf.ConfigProto()
+    config.gpu_options.allocator_type = 'BFC'
+    sess = tf.Session(config=config)
+    sess.run(init)
+
+    # Run the forward benchmark.
+    time_tensorflow_run(sess, pool5, "Forward")
+
+    # Add a simple objective so we can calculate the backward pass.
+    objective = tf.nn.l2_loss(pool5)
+    # Compute the gradient with respect to all the parameters.
+    grad = tf.gradients(objective, parameters)
+    # Run the backward benchmark.
+    time_tensorflow_run(sess, grad, "Forward-backward")
+
+
+def main(_):
+  run_benchmark()
 
 
 if __name__ == '__main__':
-    train_image = []
-    train_label = []
-
-    with tf.Graph().as_default():
-        images_placeholder = tf.placeholder('float32', shape=(None, IMAGE_PIXELS))
-        labels_placeholder = tf.placeholder('float32', shape=(None, NUM_CLASSES))
-        keep_prob = tf.placeholder('float')
-
-        logits = inference(images_placeholder, keep_prob)
-        loss_value = loss(logits, labels_placeholder)
-        train_op = training(loss_value, FLAGS.learning_rate)
-        acc = accuracy(logits, labels_placeholder)
-
-        save_path = 'models/'
-        model_name = 'model1.ckpt'
-        if not os.path.exists(save_path):
-            os.makedirs(save_path)
-        saver = tf.train.Saver()
-        save_path_full = os.path.join(save_path, model_name)
-
-        with tf.Session() as sess:
-            summary_op = tf.summary.merge_all()
-            summary_writer = tf.summary.FileWriter(FLAGS.log_dir, sess.graph)
-            sess.run(tf.global_variables_initializer())
-
-            feed_dict_not_dropout = {
-                images_placeholder: train_image[:],
-                labels_placeholder: train_label[:],
-                keep_prob: 1.0}
-            batch_step = int(len(train_image) / FLAGS.batch_size)
-
-            for step in range(FLAGS.max_steps):
-                for i in range(batch_step):
-                    batch = FLAGS.batch_size * i
-                    sess.run(train_op, feed_dict={
-                        images_placeholder: train_image[batch:batch + FLAGS.batch_size],
-                        labels_placeholder: train_label[batch:batch + FLAGS.batch_size],
-                        keep_prob: 0.5})
-
-                train_accuracy, summary_str = sess.run([acc, summary_op], feed_dict_not_dropout)
-                summary_writer.add_summary(summary_str, step)
-
-                print("step %d, training accuracy: %g" % (step, train_accuracy))
-
-            saver.save(sess, save_path_full)
+  parser = argparse.ArgumentParser()
+  parser.add_argument(
+      '--batch_size',
+      type=int,
+      default=128,
+      help='Batch size.'
+  )
+  parser.add_argument(
+      '--num_batches',
+      type=int,
+      default=100,
+      help='Number of batches to run.'
+  )
+  FLAGS, unparsed = parser.parse_known_args()
+  tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
