@@ -467,7 +467,7 @@ class tfrecords_builder_char:
 
         writer = tf.python_io.TFRecordWriter(file_name)
         labels = np.asarray(labels, dtype=np.int64)
-
+        print(len(imgs), len(labels))
         for i in range(len(imgs)):
             feature = {'train/label': self._int64_feature(labels[i]),
                        'train/image': self._bytes_feature(tf.compat.as_bytes(imgs[i].tostring()))}
@@ -482,8 +482,8 @@ class tfrecords_builder_char:
 
     @staticmethod
     def _get_img(path):
-        img = cv2.imread(path)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = cv2.imread(path,0)
+        # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         img = img.astype(np.uint8)
         return img
 

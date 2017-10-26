@@ -16,7 +16,7 @@ class tfrecords_reader:
         features = tf.parse_single_example(example_proto, features=keys_to_features)
         images = tf.decode_raw(features['train/image'], tf.uint8)
         labels = tf.cast(features['train/label'], tf.int32)
-        images = tf.reshape(images, [20, 70, 3])
+        images = tf.reshape(images, [28, 28])
         return images, labels
 
     def main(self, batch):
