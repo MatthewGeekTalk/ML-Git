@@ -29,7 +29,6 @@ class tfrecords_reader_char:
         dataset = dataset.batch(batch)
         iterator = dataset.make_one_shot_iterator()
         image_batch, label_batch = iterator.get_next()
-        print(image_batch.shape)
         # imgs, lbls = self._get_data_label(features, batch)
         with tf.Session() as sess:
             init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
@@ -37,9 +36,7 @@ class tfrecords_reader_char:
             sess.run(init_op)
             coord = tf.train.Coordinator()
             threads = tf.train.start_queue_runners(coord=coord)
-            print('test')
             images, labels = sess.run([image_batch, label_batch])
-            print('123')
             coord.request_stop()
             coord.join(threads)
 

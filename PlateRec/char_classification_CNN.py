@@ -196,7 +196,7 @@ if __name__ == '__main__':
             imgs = np.reshape(imgs, [BATCH_SIZE, 28 * 28])
             labels = np.reshape(labels, [BATCH_SIZE, 45])
             if i % 2 == 0:
-                train_accuracy = accuracy.eval(feed_dict={x: imgs, y_: labels, keep_prob: 1.0})
+                train_accuracy = accuracy.eval(feed_dict={x: imgs, y_: labels, keep_pro b: 1.0})
                 print('step %d, training accuracy %g' % (i, train_accuracy))
             train_step.run(feed_dict={x: imgs, y_: labels, keep_prob: 0.5})
         # writer = tf.summary.FileWriter("/nfs/users/matthew/saved_model", sess.graph)
