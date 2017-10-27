@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 
-class tfrecords_reader:
+class tfrecords_reader_char:
     def __init__(self, path):
         self.tfrecord_path = path
 
@@ -16,7 +16,7 @@ class tfrecords_reader:
         features = tf.parse_single_example(example_proto, features=keys_to_features)
         images = tf.decode_raw(features['train/image'], tf.uint8)
         labels = tf.cast(features['train/label'], tf.int32)
-        images = tf.reshape(images, [20, 70, 3])
+        images = tf.reshape(images, [28, 28])
         return images, labels
 
     def main(self, batch):
@@ -29,7 +29,6 @@ class tfrecords_reader:
         dataset = dataset.batch(batch)
         iterator = dataset.make_one_shot_iterator()
         image_batch, label_batch = iterator.get_next()
-        print(image_batch.shape)
         # imgs, lbls = self._get_data_label(features, batch)
         with tf.Session() as sess:
             init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
@@ -37,9 +36,7 @@ class tfrecords_reader:
             sess.run(init_op)
             coord = tf.train.Coordinator()
             threads = tf.train.start_queue_runners(coord=coord)
-            print('test')
             images, labels = sess.run([image_batch, label_batch])
-            print('123')
             coord.request_stop()
             coord.join(threads)
 
@@ -96,7 +93,7 @@ class tfrecords_reader:
 
 if __name__ == '__main__':
     path = os.path.abspath('../TFRecords')
-    reader = tfrecords_reader(path)
+    reader = tfrecords_reader_char(path)
     imgs, labels = reader.main(50)
     # imgs, labels = reader.main(3137)
     print(imgs.shape, labels.shape)
