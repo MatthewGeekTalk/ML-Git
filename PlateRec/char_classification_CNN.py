@@ -13,7 +13,7 @@ os.environ["PYTHONUNBUFFERED"] = "0"
 
 class deepcnn(object):
     def __init__(self, x):
-        self.x = tf.reshape(x, [-1, 28, 28])
+        self.x = tf.reshape(x, [-1, 28, 28,1])
         self.conv1_name = ""
         self.conv2_name = ""
         self.pool1_name = ""
@@ -149,7 +149,7 @@ if __name__ == '__main__':
 
     cnn.set_name(conv1='conv1', conv2='conv2', pool1='pool1', pool2='pool2', dense='dense',
                  output='output', dropout='dropout')
-    cnn.set_conv1_shape([5, 5, 3, 32], [32])
+    cnn.set_conv1_shape([5, 5, 1, 32], [32])
     cnn.set_conv2_shape([5, 5, 32, 64], [64])
     cnn.set_dense_shape([7 * 7 * 64, 1024], [1024])
     cnn.set_output_shape([1024, 45], [45])
