@@ -11,7 +11,8 @@ SESS = 'binary_classification_CNN.ckpt'
 class PlateValidate(object):
     def __init__(self, imgs):
         dir(tf.contrib)
-        self.imgs = self.__get_imgs(imgs=imgs)
+        self.imgs = imgs
+        self.in_imgs = self.__get_imgs(imgs=imgs)
         self.imgs_labels = []
 
     def __get_imgs(self, imgs):
@@ -33,9 +34,9 @@ class PlateValidate(object):
             y = graph.get_tensor_by_name('output/predict_sm:0')
             keep_prob = graph.get_tensor_by_name('keep_prob:0')
 
-            for i in range(len(self.imgs)):
+            for i in range(len(self.in_imgs)):
                 logits = sess.run(y, feed_dict={
-                    x: self.imgs[i], keep_prob: .5
+                    x: self.in_imgs[i], keep_prob: .5
                 })
 
                 logits = np.reshape(logits, [2])
@@ -47,7 +48,7 @@ class PlateValidate(object):
 
     def main(self):
         self.__plate_validate()
-        return self.__return_labels()
+        return self.imgs, self.__return_labels()
 
 
 if __name__ == '__main__':
@@ -69,6 +70,7 @@ if __name__ == '__main__':
         img_list.append(img)
 
     plate_validate = PlateValidate(img_list)
-    labels = plate_validate.main()
+    imgs, labels = plate_validate.main()
 
     print(labels)
+    print(imgs)
