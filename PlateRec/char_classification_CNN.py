@@ -193,8 +193,8 @@ if __name__ == '__main__':
         sess.run(init_op)
         for i in range(77):
             imgs, labels = reader.main(batch=BATCH_SIZE)
-            imgs = np.reshape(imgs, [BATCH_SIZE, 20 * 70 * 3])
-            labels = np.reshape(labels, [BATCH_SIZE, 2])
+            imgs = np.reshape(imgs, [BATCH_SIZE, 28 * 28])
+            labels = np.reshape(labels, [BATCH_SIZE, 45])
             if i % 2 == 0:
                 train_accuracy = accuracy.eval(feed_dict={x: imgs, y_: labels, keep_prob: 1.0})
                 print('step %d, training accuracy %g' % (i, train_accuracy))
