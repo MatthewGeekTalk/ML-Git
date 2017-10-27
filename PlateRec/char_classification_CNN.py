@@ -13,7 +13,7 @@ os.environ["PYTHONUNBUFFERED"] = "0"
 
 class deepcnn(object):
     def __init__(self, x):
-        self.x = tf.reshape(x, [-1, 20, 70, 3])
+        self.x = tf.reshape(x, [-1, 28, 28])
         self.conv1_name = ""
         self.conv2_name = ""
         self.pool1_name = ""
@@ -141,8 +141,8 @@ class deepcnn(object):
 
 
 if __name__ == '__main__':
-    x = tf.placeholder(tf.float32, [None, 20 * 70 * 3], name='x')
-    y_ = tf.placeholder(tf.float32, [None, 2], name='y_')
+    x = tf.placeholder(tf.float32, [None, 28 * 28], name='x')
+    y_ = tf.placeholder(tf.float32, [None, 45], name='y_')
     keep_prob = tf.placeholder(tf.float32, name='keep_prob')
 
     cnn = deepcnn(x)
@@ -151,8 +151,8 @@ if __name__ == '__main__':
                  output='output', dropout='dropout')
     cnn.set_conv1_shape([5, 5, 3, 32], [32])
     cnn.set_conv2_shape([5, 5, 32, 64], [64])
-    cnn.set_dense_shape([5 * 18 * 64, 1024], [1024])
-    cnn.set_output_shape([1024, 2], [2])
+    cnn.set_dense_shape([7 * 7 * 64, 1024], [1024])
+    cnn.set_output_shape([1024, 45], [45])
     cnn.set_keep_prob(keep_prob)
     y_conv = cnn.build_cnn()
 
@@ -191,7 +191,7 @@ if __name__ == '__main__':
         init_op = tf.group(tf.local_variables_initializer(), tf.global_variables_initializer())
         # init_op = tf.global_variables_initializer()
         sess.run(init_op)
-        for i in range(77):
+        for i in range(166):
             imgs, labels = reader.main(batch=BATCH_SIZE)
             imgs = np.reshape(imgs, [BATCH_SIZE, 28 * 28])
             labels = np.reshape(labels, [BATCH_SIZE, 45])
