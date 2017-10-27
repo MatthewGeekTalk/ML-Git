@@ -14,7 +14,7 @@ os.environ["PYTHONUNBUFFERED"] = "0"
 
 class deepcnn(object):
     def __init__(self, x):
-        self.x = tf.reshape(x, [-1, 28, 28])
+        self.x = tf.reshape(x, [-1, 20, 70, 3])
         self.conv1_name = ""
         self.conv2_name = ""
         self.pool1_name = ""
@@ -142,8 +142,8 @@ class deepcnn(object):
 
 
 if __name__ == '__main__':
-    x = tf.placeholder(tf.float32, [None, 28 * 28], name='x')
-    y_ = tf.placeholder(tf.float32, [None, 45], name='y_')
+    x = tf.placeholder(tf.float32, [None, 20 * 70 * 3], name='x')
+    y_ = tf.placeholder(tf.float32, [None, 2], name='y_')
     keep_prob = tf.placeholder(tf.float32, name='keep_prob')
 
     cnn = deepcnn(x)
@@ -152,8 +152,8 @@ if __name__ == '__main__':
                  output='output', dropout='dropout')
     cnn.set_conv1_shape([5, 5, 3, 32], [32])
     cnn.set_conv2_shape([5, 5, 32, 64], [64])
-    cnn.set_dense_shape([7 * 7 * 64, 1024], [1024])
-    cnn.set_output_shape([1024, 45], [45])
+    cnn.set_dense_shape([5 * 18 * 64, 1024], [1024])
+    cnn.set_output_shape([1024, 2], [2])
     cnn.set_keep_prob(keep_prob)
     y_conv = cnn.build_cnn()
 
@@ -182,7 +182,7 @@ if __name__ == '__main__':
 
     # MODEL_PATH = os.path.abspath('./net_structure/binary_classification_CNN.ckpt')
     # path at sap gpu server
-    MODEL_PATH = '/nfs/users/matthew/saved_model/char_classification_CNN.ckpt'
+    MODEL_PATH = '/nfs/users/matthew/saved_model/binary_classification_CNN.ckpt'
     saver = tf.train.Saver()
 
     # config = tf.ConfigProto()
@@ -192,10 +192,10 @@ if __name__ == '__main__':
         init_op = tf.group(tf.local_variables_initializer(), tf.global_variables_initializer())
         # init_op = tf.global_variables_initializer()
         sess.run(init_op)
-        for i in range(166):
+        for i in range(77):
             imgs, labels = reader.main(batch=BATCH_SIZE)
-            imgs = np.reshape(imgs, [BATCH_SIZE, 28 * 28])
-            labels = np.reshape(labels, [BATCH_SIZE, 45])
+            imgs = np.reshape(imgs, [BATCH_SIZE, 20 * 70 * 3])
+            labels = np.reshape(labels, [BATCH_SIZE, 2])
             if i % 2 == 0:
                 train_accuracy = accuracy.eval(feed_dict={x: imgs, y_: labels, keep_prob: 1.0})
                 print('step %d, training accuracy %g' % (i, train_accuracy))
