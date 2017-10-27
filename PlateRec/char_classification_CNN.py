@@ -181,7 +181,7 @@ if __name__ == '__main__':
 
     # MODEL_PATH = os.path.abspath('./net_structure/binary_classification_CNN.ckpt')
     # path at sap gpu server
-    MODEL_PATH = '/nfs/users/matthew/saved_model/binary_classification_CNN.ckpt'
+    MODEL_PATH = '/nfs/users/matthew/saved_model/char_classification_CNN.ckpt'
     saver = tf.train.Saver()
 
     # config = tf.ConfigProto()
