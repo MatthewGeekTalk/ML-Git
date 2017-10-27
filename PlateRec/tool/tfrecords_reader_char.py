@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
 
 
-class tfrecords_reader:
+class tfrecords_reader_char:
     def __init__(self, path):
         self.tfrecord_path = path
 
@@ -96,7 +96,7 @@ class tfrecords_reader:
 
 if __name__ == '__main__':
     path = os.path.abspath('../TFRecords')
-    reader = tfrecords_reader(path)
+    reader = tfrecords_reader_char(path)
     imgs, labels = reader.main(50)
     # imgs, labels = reader.main(3137)
     print(imgs.shape, labels.shape)
