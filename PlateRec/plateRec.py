@@ -67,8 +67,8 @@ if __name__ == '__main__':
     for i in range(len(region_plate)):
         img = cv2.drawContours(img, [region_plate[i]], 0, (0, 255, 0), 2)
 
-    # plt.imshow(img)
-    # plt.show()
+    plt.imshow(img)
+    plt.show()
 
     char_detect = charsSegment()
     for img in img_plate:
