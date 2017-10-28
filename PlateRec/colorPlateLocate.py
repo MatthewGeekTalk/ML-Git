@@ -88,7 +88,7 @@ class ColorPlateLocate:
         min_h, max_h = self.__set_min_max(case)
         img = cv2.inRange(img, min_h, max_h)
         img = self.__img_morph_close(img)
-        region = self.__find_plate_number_region(img)
+        region, box = self.__find_plate_number_region(img)
         plates = self.__detect_region(region, self.imgOrg)
         plates = self.__split_plate(plates, case)
 
@@ -97,7 +97,7 @@ class ColorPlateLocate:
             plate = self.__resize_plates(plate)
             self.plates.append(plate)
 
-        self.regions = region
+        self.regions = box
 
     def set_morph_hw(self, morph_w, morph_h):
         self.morphW = morph_w
@@ -241,6 +241,7 @@ class ColorPlateLocate:
 
     def __find_plate_number_region(self, img):
         region = []
+        safe_box = []
         img_find = img.copy()
         im2, contours, hierarchy = cv2.findContours(img_find, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
         for i in range(len(contours)):
@@ -264,7 +265,8 @@ class ColorPlateLocate:
                 continue
             angel = (safe_rect, rect)
             region.append(angel)
-        return region
+            safe_box.append(box)
+        return region, safe_box
 
     @staticmethod
     def __check_angle(height, width, angle):

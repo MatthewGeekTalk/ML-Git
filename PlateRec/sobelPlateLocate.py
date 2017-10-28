@@ -15,6 +15,7 @@ class SobelPlateLocate(object):
         self.morphH = 0
         self.morphW = 0
         self.region = []
+        self._ = []
         self.plates = []
         self.verify_min = 0
         self.verify_max = 0
@@ -37,7 +38,7 @@ class SobelPlateLocate(object):
         self.img = self.__img_sobel(self.img)
         self.img = self.__img_binary(self.img)
         self.img = self.__img_morph_close(self.img, self.morphW, self.morphH)
-        self.region, self.angle = self.__find_plate_number_region()
+        self.region, self.angle, self._ = self.__find_plate_number_region()
         # self.img_opr = self.__sobelOper(self.img_opr, 3, 10, 3)
         self.plates = self.__detect_region()
         return self.plates
@@ -97,6 +98,7 @@ class SobelPlateLocate(object):
         return cv2.resize(img, (self.width, self.height), interpolation=cv2.INTER_CUBIC)
 
     def __find_plate_number_region(self):
+        _ = []
         region = []
         angle = []
         img_find = self.img.copy()
@@ -125,13 +127,14 @@ class SobelPlateLocate(object):
             if self.__verify_value(safe_height, safe_width):
                 continue
             region.append(safe_box)
+            _.append(box)
             if height > width:
                 angle1 = rect[2] + 90
             else:
                 angle1 = rect[2]
             center_angle = [safe_rect[0][0], safe_rect[0][1], angle1]
             angle.append(center_angle)
-        return region, angle
+        return region, angle, _
 
     # Enlarge and Rotation
     def __enlarge_rotation(self, src, angle):
@@ -296,7 +299,7 @@ class SobelPlateLocate(object):
         return self.plates
 
     def return_regions(self):
-        return self.region
+        return self._
 
     def img_show(self):
         cv2.imshow('img', self.imgOrg)

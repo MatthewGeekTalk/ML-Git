@@ -28,17 +28,21 @@ class PlateRec(object):
 
         self.plate_validate = PlateValidate()
 
+        self._plate_with_no = []
+
     def main(self):
         self._plates_sobel, self._regions_sobel = self.__detect_plate_sobel()
-        self._plates_color, self._regions_color = self.__detect_plate_color()
+        # self._plates_color, self._regions_color = self.__detect_plate_color()
         self._img_con_sobel = self.__prepare_contours_img(regions=self._regions_sobel)
-        self._img_con_color = self.__prepare_contours_img(regions=self._regions_sobel)
+        # self._img_con_color = self.__prepare_contours_img(regions=self._regions_color)
 
-        # for plate in self._plates:
-        #     list(self._chars).append(self.__detect_char(plate=plate))
+        for i in range(len(self._plates_sobel)):
+            chars = self.__detect_char(plate=self._plates_sobel[i])
+            self._plate_with_no.append({'id': i, 'key': chars})
 
     def __prepare_contours_img(self, regions):
-        return self.__draw_contours(img=self._img, plate_regions=regions)
+        ori_img = self._img.copy()
+        return self.__draw_contours(img=ori_img, plate_regions=regions)
 
     @staticmethod
     def __detect_char(plate):
@@ -100,6 +104,7 @@ class PlateRec(object):
 
     @staticmethod
     def print_plate(plate):
+        plate = cv2.cvtColor(plate, cv2.COLOR_BGR2RGB)
         plt.axis('off')
         plt.imshow(plate)
         plt.show()
@@ -136,6 +141,10 @@ class PlateRec(object):
     def regions_color(self):
         return self._regions_color
 
+    @property
+    def plate_with_no(self):
+        return self._plate_with_no
+
 
 if __name__ == '__main__':
 
@@ -153,10 +162,12 @@ if __name__ == '__main__':
 
     plate_rec.print_plate(plate_rec.img_con_sobel)
 
-    for plate in plate_rec.plates_color:
-        plate_rec.print_plate(plate)
+    print(plate_rec.plate_with_no)
 
-    plate_rec.print_plate(plate_rec.img_con_color)
+    # for plate in plate_rec.plates_color:
+    #     plate_rec.print_plate(plate)
+    #
+    # plate_rec.print_plate(plate_rec.img_con_color)
 
 
     # char_detect = charsSegment()
