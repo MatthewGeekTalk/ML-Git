@@ -17,6 +17,7 @@ class SobelPlateLocate(object):
         self.region = []
         self._ = []
         self.plates = []
+        self.plates_ori = []
         self.verify_min = 0
         self.verify_max = 0
         self.verify_aspect = 0
@@ -40,8 +41,8 @@ class SobelPlateLocate(object):
         self.img = self.__img_morph_close(self.img, self.morphW, self.morphH)
         self.region, self.angle, self._ = self.__find_plate_number_region()
         # self.img_opr = self.__sobelOper(self.img_opr, 3, 10, 3)
-        self.plates = self.__detect_region()
-        return self.plates
+        self.plates, self.plates_ori = self.__detect_region()
+        return self.plates, self.plates_ori
 
     def set_size(self, height, width):
         self.height = height
@@ -269,6 +270,7 @@ class SobelPlateLocate(object):
 
     def __detect_region(self):
         plates = []
+        plates_ori = []
         i = 0
         for box in self.region:
             # cv2.drawContours(self.imgOrg, [box], 0, (0, 255, 0), 2)
@@ -290,13 +292,17 @@ class SobelPlateLocate(object):
                         img_plate_sc.shape[1] != 0 and img_plate_sc.shape[0] != 0):
                 if (self.angle[i][2] < -5 or self.angle[i][2] > 5):
                     img_plate_sc = self.__deskew(img_plate, self.angle[i][2], img_plate_sc)
+                plates_ori.append(img_plate_sc)
                 img_plate_sc = self.__resize_plates(img_plate_sc)
                 plates.append(img_plate_sc)
             i = i + 1
-        return plates
+        return plates, plates_ori
 
     def return_plates(self):
         return self.plates
+
+    def return_plates_ori(self):
+        return self.plates_ori
 
     def return_regions(self):
         return self._
