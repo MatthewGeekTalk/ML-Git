@@ -25,9 +25,11 @@ class SobelPlateLocate(object):
         self.height = 0
         self.width = 0
 
-    def read_img(self, img_path):
-        self.img = cv2.imread(img_path)
-        self.imgOrg = cv2.imread(img_path)
+    def read_img(self, img):
+        self.img = img
+        self.imgOrg = img
+        # self.img = cv2.imread(img_path)
+        # self.imgOrg = cv2.imread(img_path)
 
     def plate_locate(self):
         self.img = self.__gaussian_blur(self.img, self.m_GaussianBlurSize)
@@ -309,8 +311,11 @@ class SobelPlateLocate(object):
 if __name__ == '__main__':
     print('Image path: %s' % str(os.path.abspath('../Material')).replace('\\', '\\\\'))
     path = input('Please input your image path:')
+
+    img = cv2.imread(path, cv2.COLOR_BGR2RGB)
+
     plate_locate = SobelPlateLocate()
-    plate_locate.read_img(path)
+    plate_locate.read_img(img)
     plate_locate.set_size(20, 72)
     plate_locate.set_gaussian_size(5)
     plate_locate.set_morph_hw(17, 3)

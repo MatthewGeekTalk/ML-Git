@@ -9,11 +9,18 @@ SESS = 'binary_classification_CNN.ckpt'
 
 
 class PlateValidate(object):
-    def __init__(self, imgs):
+    def __init__(self):
         dir(tf.contrib)
-        self.imgs = imgs
-        self.in_imgs = self.__get_imgs(imgs=imgs)
+        self.imgs = []
+        self.in_imgs = []
         self.imgs_labels = []
+
+        self.init = tf.global_variables_initializer()
+        self.saver = tf.train.import_meta_graph(MODEL_PATH + os.sep + GRAPH)
+        self.graph = tf.get_default_graph()
+        self.x = self.graph.get_tensor_by_name('x:0')
+        self.y = self.graph.get_tensor_by_name('output/predict_sm:0')
+        self.keep_prob = self.graph.get_tensor_by_name('keep_prob:0')
 
     def __get_imgs(self, imgs):
         imgs_list = []
@@ -27,16 +34,11 @@ class PlateValidate(object):
 
     def __plate_validate(self):
         with tf.Session() as sess:
-            saver = tf.train.import_meta_graph(MODEL_PATH + os.sep + GRAPH)
-            saver.restore(sess, MODEL_PATH + os.sep + SESS)
-            graph = tf.get_default_graph()
-            x = graph.get_tensor_by_name('x:0')
-            y = graph.get_tensor_by_name('output/predict_sm:0')
-            keep_prob = graph.get_tensor_by_name('keep_prob:0')
-
+            sess.run(self.init)
+            self.saver.restore(sess, MODEL_PATH + os.sep + SESS)
             for i in range(len(self.in_imgs)):
-                logits = sess.run(y, feed_dict={
-                    x: self.in_imgs[i], keep_prob: .5
+                logits = sess.run(self.y, feed_dict={
+                    self.x: self.in_imgs[i], self.keep_prob: .5
                 })
 
                 logits = np.reshape(logits, [2])
@@ -46,7 +48,9 @@ class PlateValidate(object):
     def __return_labels(self):
         return self.imgs_labels
 
-    def main(self):
+    def main(self, imgs):
+        self.imgs = imgs
+        self.in_imgs = self.__get_imgs(imgs=imgs)
         self.__plate_validate()
         return self.imgs, self.__return_labels()
 
