@@ -38,7 +38,7 @@ class PlateRec(object):
 
         for i in range(len(self._plates_sobel)):
             chars = self.__detect_char(plate=self._plates_sobel[i])
-            self._plate_with_no.append({'id': i, 'key': chars})
+            self._plate_with_no.append({'id': i, 'value': chars})
 
     def __prepare_contours_img(self, regions):
         ori_img = self._img.copy()
@@ -104,7 +104,8 @@ class PlateRec(object):
 
     @staticmethod
     def print_plate(plate):
-        plate = cv2.cvtColor(plate, cv2.COLOR_BGR2RGB)
+        if len(plate.shape) == 3:
+            plate = cv2.cvtColor(plate, cv2.COLOR_BGR2RGB)
         plt.axis('off')
         plt.imshow(plate)
         plt.show()
@@ -162,20 +163,6 @@ if __name__ == '__main__':
 
     plate_rec.print_plate(plate_rec.img_con_sobel)
 
-    print(plate_rec.plate_with_no)
-
-    # for plate in plate_rec.plates_color:
-    #     plate_rec.print_plate(plate)
-    #
-    # plate_rec.print_plate(plate_rec.img_con_color)
-
-
-    # char_detect = charsSegment()
-    # for img in img_plate:
-    #     char_img = char_detect.read_img(img)
-    #     chars = char_detect.charsSegment(char_img, 'BLUE')
-    #
-    #     for char in chars:
-    #         plt.axis('off')
-    #         plt.imshow(char)
-    #         plt.show()
+    for plate in plate_rec.plate_with_no:
+        for char in plate['value']:
+            plate_rec.print_plate(char)
