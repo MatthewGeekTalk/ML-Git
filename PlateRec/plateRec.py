@@ -27,8 +27,8 @@ class PlateRec(object):
         self._plates_color = object
         self._regions_color = object
 
-        self.plate_validate = PlateValidate()
-        self.char_determine = CharDetermine()
+        self._char_imgs = object
+        self._char_labels = object
 
         self._plate_with_no = []
 
@@ -39,18 +39,23 @@ class PlateRec(object):
         # self._img_con_color = self.__prepare_contours_img(regions=self._regions_color)
 
         for i in range(len(self._plates_sobel)):
-            chars = self.__detect_char(plate=self._plates_sobel[i])
-            self._plate_with_no.append({'id': i, 'value': chars})
+            self.__detect_char(self._plates_sobel[i])
 
     def __prepare_contours_img(self, regions):
         ori_img = self._img.copy()
         return self.__draw_contours(img=ori_img, plate_regions=regions)
 
-    @staticmethod
-    def __detect_char(plate):
+    def __detect_char(self, plate):
         char_detect = charsSegment()
         char_img = char_detect.read_img(plate)
-        return char_detect.charsSegment(char_img, 'BLUE')
+        chars = char_detect.charsSegment(char_img, 'BLUE')
+
+        char_determine = CharDetermine()
+
+        imgs, labels = char_determine.main(chars)
+        for i in range(len(imgs)):
+            self.print_plate(imgs[i])
+            print(labels[i])
 
     def __detect_plate_sobel(self):
         img_plate = []
@@ -66,7 +71,8 @@ class PlateRec(object):
         sobel_plates = plate_sobel.return_plates()
         sobel_regions = plate_sobel.return_regions()
 
-        imgs, labels = self.plate_validate.main(sobel_plates)
+        plate_validate = PlateValidate()
+        imgs, labels = plate_validate.main(sobel_plates)
 
         for i in range(len(imgs)):
             if labels[i] == IS_PLATE:
@@ -89,7 +95,8 @@ class PlateRec(object):
         color_plates = plate_color.return_plates()
         color_regions = plate_color.return_regions()
 
-        imgs, labels = self.plate_validate.main(color_plates)
+        plate_validate = PlateValidate()
+        imgs, labels = plate_validate.main(color_plates)
 
         for i in range(len(imgs)):
             if labels[i] == IS_PLATE:
@@ -165,6 +172,6 @@ if __name__ == '__main__':
 
     plate_rec.print_plate(plate_rec.img_con_sobel)
 
-    for plate in plate_rec.plate_with_no:
-        for char in plate['value']:
-            plate_rec.print_plate(char)
+    # for plate in plate_rec.plate_with_no:
+    #     for char in plate['value']:
+    #         plate_rec.print_plate(char)

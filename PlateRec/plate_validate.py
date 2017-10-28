@@ -15,12 +15,7 @@ class PlateValidate(object):
         self.in_imgs = []
         self.imgs_labels = []
 
-        self.init = tf.global_variables_initializer()
-        self.saver = tf.train.import_meta_graph(MODEL_PATH + os.sep + GRAPH)
-        self.graph = tf.get_default_graph()
-        self.x = self.graph.get_tensor_by_name('x:0')
-        self.y = self.graph.get_tensor_by_name('output/predict_sm:0')
-        self.keep_prob = self.graph.get_tensor_by_name('keep_prob:0')
+        self.Graph = tf.Graph()  # initialize new graph for multiple model loading
 
     @staticmethod
     def __get_imgs(imgs):
@@ -34,12 +29,19 @@ class PlateValidate(object):
         return imgs_list
 
     def __plate_validate(self):
-        with tf.Session() as sess:
-            sess.run(self.init)
-            self.saver.restore(sess, MODEL_PATH + os.sep + SESS)
+        with tf.Session(graph=self.Graph) as sess:
+            init = tf.global_variables_initializer()
+            saver = tf.train.import_meta_graph(MODEL_PATH + os.sep + GRAPH)
+            graph = tf.get_default_graph()
+            saver.restore(sess, MODEL_PATH + os.sep + SESS)
+            x = graph.get_tensor_by_name('x:0')
+            y = graph.get_tensor_by_name('output/predict_sm:0')
+            keep_prob = graph.get_tensor_by_name('keep_prob:0')
+
+            sess.run(init)
             for i in range(len(self.in_imgs)):
-                logits = sess.run(self.y, feed_dict={
-                    self.x: self.in_imgs[i], self.keep_prob: .5
+                logits = sess.run(y, feed_dict={
+                    x: self.in_imgs[i], keep_prob: .5
                 })
 
                 logits = np.reshape(logits, [2])

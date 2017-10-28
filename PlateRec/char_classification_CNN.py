@@ -13,7 +13,7 @@ os.environ["PYTHONUNBUFFERED"] = "0"
 
 class deepcnn(object):
     def __init__(self, x):
-        self.x = tf.reshape(x, [-1, 28, 28,1])
+        self.x = tf.reshape(x, [-1, 28, 28, 1])
         self.conv1_name = ""
         self.conv2_name = ""
         self.pool1_name = ""
@@ -87,24 +87,24 @@ class deepcnn(object):
 
     @staticmethod
     def _conv2d(x, W):
-        return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME',name='conv2d')
+        return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME', name='conv2d')
 
     @staticmethod
     def _max_pool(x, width, height):
         return tf.nn.max_pool(x, ksize=[1, width, height, 1],
-                              strides=[1, width, height, 1], padding='SAME',name='max_pool')
+                              strides=[1, width, height, 1], padding='SAME', name='max_pool')
 
     @staticmethod
     def _build_dropout(name, x, keep_prob):
         with tf.name_scope(name=name):
-            h_dense_drop = tf.nn.dropout(x, keep_prob,name='dense_drop')
+            h_dense_drop = tf.nn.dropout(x, keep_prob, name='dense_drop')
             return h_dense_drop
 
     def _build_conv(self, name, weight_shape, bias_shape, x):
         with tf.name_scope(name=name):
             W_conv1 = self._weight_variable(weight_shape)
             b_conv1 = self._bias_variable(bias_shape)
-            h_conv1 = tf.nn.relu(self._conv2d(x, W_conv1) + b_conv1,name='conv_relu')
+            h_conv1 = tf.nn.relu(self._conv2d(x, W_conv1) + b_conv1, name='conv_relu')
             return h_conv1
 
     def _build_pool(self, name, conv, width, height):
@@ -116,7 +116,7 @@ class deepcnn(object):
         with tf.name_scope(name=name):
             W_dense = self._weight_variable(weight_shape)
             b_dense = self._bias_variable(bias_shape)
-            h_pool2_flat = tf.reshape(x, [-1, weight_shape[0]],name='pool2_flat')
+            h_pool2_flat = tf.reshape(x, [-1, weight_shape[0]], name='pool2_flat')
             h_dense = tf.nn.relu(tf.matmul(h_pool2_flat, W_dense) + b_dense, name='dense_relu')
             return h_dense
 
