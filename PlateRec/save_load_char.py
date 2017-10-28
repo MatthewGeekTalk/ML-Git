@@ -26,10 +26,10 @@ import matplotlib.pyplot as plt
 # saver.save(sess, save_path='./test',global_step=1000)
 
 if __name__ == '__main__':
-    img = cv2.imread('hu.jpg',0)
+    img = cv2.imread('hu.jpg', 0)
     print(img.shape)
     # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    img = np.reshape(img,[1,784])
+    img = np.reshape(img, [1, 784])
     # img = tf.reshape(img,[1,4200])
     sess = tf.Session()
     dir(tf.contrib)
@@ -46,6 +46,3 @@ if __name__ == '__main__':
     # print(sess.run("dense/bias:0"))
     # print(img.shape)
     # print(x.shape)
-
-
-

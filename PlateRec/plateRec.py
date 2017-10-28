@@ -9,6 +9,7 @@ from sobelPlateLocate import SobelPlateLocate
 from colorPlateLocate import ColorPlateLocate
 from plate_validate import PlateValidate
 from charsSegment import charsSegment
+from char_determine import CharDetermine
 
 IS_PLATE = [0, 1]
 
@@ -27,6 +28,7 @@ class PlateRec(object):
         self._regions_color = object
 
         self.plate_validate = PlateValidate()
+        self.char_determine = CharDetermine()
 
         self._plate_with_no = []
 
