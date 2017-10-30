@@ -2,6 +2,7 @@ import sys
 import os
 import cv2
 import matplotlib.pyplot as plt
+import matplotlib.image as Image
 
 sys.path.insert(0, os.path.abspath('./'))
 from sobelPlateLocate import SobelPlateLocate
@@ -228,6 +229,12 @@ class PlateRec(object):
         plt.imshow(plate)
         plt.show()
 
+    @staticmethod
+    def save_plate(path, plate):
+        if len(plate.shape) == 3:
+            plate = cv2.cvtColor(plate, cv2.COLOR_BGR2RGB)
+        Image.imsave(path, plate)
+
     @property
     def img(self):
         return self._img
@@ -286,6 +293,9 @@ if __name__ == '__main__':
 
     for plate in plate_rec.plates_sobel_ori:
         plate_rec.print_plate(plate)
+
+        path2 = input('Please input your saving path:')
+        plate_rec.save_plate(path2, plate)
 
     plate_rec.print_plate(plate_rec.img_con_sobel)
 
