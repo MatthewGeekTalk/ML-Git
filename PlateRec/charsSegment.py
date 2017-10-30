@@ -13,12 +13,14 @@ class charsSegment:
         return self.img
 
     def charsSegment(self, img, color):
+        char = []
         chars = []
         img_gay = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         img_threshold = self.spatial_ostu(img_gay, color)
         im2, contours, hierarchy = cv2.findContours(img_threshold, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
         # cv2.imshow('test', img_threshold)
         for i in range(len(contours)):
+            pack = []
             cnt = contours[i]
             area = cv2.contourArea(cnt)
             if area <= 10:
@@ -45,19 +47,33 @@ class charsSegment:
                 y2 = box[ys_sorted_index[3], 1]
                 img_plate = img_threshold[y1:y2, x1:x2]
                 result = self.verifyCharSizes(img_plate, height, width)
-                if img_plate.shape[0] != 0 and img_plate.shape[1] != 0:
+                if result == True:
+                    pack.append([x1,x2,y1,y2])
+                    pack.append([height,width])
+                    char.append([x1,pack])
+        char = sorted(char)
+        for i in range(len(char)):
+            x1 = char[i][1][0][0]
+            x2 = char[i][1][0][1]
+            y1 = char[i][1][0][2]
+            y2 = char[i][1][0][3]
+            height = char[i][1][1][0]
+            width = char[i][1][1][1]
+            if i == 0:
+                img_plate = img_threshold[0:img_threshold.shape[0], x1:x2]
+            else:
+                img_plate = img_threshold[y1:y2, x1:x2]
+            result = self.verifyCharSizes(img_plate, height, width)
+            if img_plate.shape[0] != 0 and img_plate.shape[1] != 0:
+                if i != 0:
                     if img_plate.shape[0] / img_plate.shape[1] > 2:
                         left = np.int0(img_plate.shape[1] * 0.5)
                         right = np.int0(img_plate.shape[1] * 0.5)
                         img_plate = cv2.copyMakeBorder(img_plate, 0, 0, left, right, cv2.BORDER_CONSTANT,
                                                        value=[0, 0, 0])
-                    img_plate = cv2.resize(img_plate, (28, 28), interpolation=cv2.INTER_CUBIC)
-                if result == True:
-                    chars.append(img_plate)
-                    # cv2.imshow('plates_' + str(i), img_plate)
-                    # img1 = cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0))
-                    # cv2.imshow('plates1_' + str(i), img1)
-        # cv2.waitKey(0)
+                img_plate = cv2.resize(img_plate, (28, 28), interpolation=cv2.INTER_CUBIC)
+            if result == True:
+                chars.append(img_plate)
         return chars
 
     def verifyCharSizes(self, img, height, width):
@@ -91,7 +107,7 @@ class charsSegment:
 
 
 if __name__ == '__main__':
-    img = cv2.imread('000_1.jpg')
+    img = cv2.imread('test.jpg')
     charsSegment = charsSegment()
     img = charsSegment.read_img(img)
     chars = charsSegment.charsSegment(img, 'BLUE')
