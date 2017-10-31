@@ -107,7 +107,7 @@ class charsSegment:
 
 
 if __name__ == '__main__':
-    img = cv2.imread('苏A0CP56.jpg')
+    img = cv2.imread('test.jpg')
     charsSegment = charsSegment()
     img = charsSegment.read_img(img)
     chars = charsSegment.charsSegment(img, 'BLUE')
