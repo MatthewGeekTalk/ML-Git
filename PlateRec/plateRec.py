@@ -294,8 +294,8 @@ if __name__ == '__main__':
     for plate in plate_rec.plates_sobel_ori:
         plate_rec.print_plate(plate)
 
-        path2 = input('Please input your saving path:')
-        plate_rec.save_plate(path2, plate)
+        # path2 = input('Please input your saving path:')
+        # plate_rec.save_plate(path2, plate)
 
     plate_rec.print_plate(plate_rec.img_con_sobel)
 
