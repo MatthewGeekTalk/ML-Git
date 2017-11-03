@@ -137,9 +137,9 @@ class PlateRec(object):
         self._img_con_color = self.__prepare_contours_img(regions=self._regions_color)
 
         if len(self._plates_sobel_ori) == len(self._plates_color_ori):
-            is_plates = self._plates_color_ori
-        else:
             is_plates = self._plates_sobel_ori
+        else:
+            is_plates = self._plates_color_ori
 
         for i in range(len(is_plates)):
             self.__detect_char(is_plates[i])
