@@ -51,7 +51,7 @@ class tfrecords_builder_char:
         self.is_yue = os.path.abspath('../../trainingchar1/yue')
         self.is_zhe = os.path.abspath('../../trainingchar1/zhe')
         self.is_liao = os.path.abspath('../../trainingchar1/liao')
-        self.is_min = os.path.abspath('../../trainingchar1/min')
+        self.is_hei = os.path.abspath('../../trainingchar1/hei')
         self.IS_A = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         self.IS_B = [0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -148,7 +148,7 @@ class tfrecords_builder_char:
         self.IS_LIAO = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                         0,
                         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
-        self.IS_MIN = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        self.IS_HEI = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                        0,
                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
         self.TFRECORDS_ADDR = os.path.abspath('../TFRecords')
@@ -429,13 +429,13 @@ class tfrecords_builder_char:
             img = self._get_img(path)
             imgs.append(img)
             labels.append(self.IS_LIAO)
-        # 闽-----------------------------------------------------------------------
-        min = os.listdir(self.is_min)
-        for i in range(len(min)):
-            path = self.is_min + os.path.sep + str(min[i])
+        # 黑-----------------------------------------------------------------------
+        hei = os.listdir(self.is_hei)
+        for i in range(len(hei)):
+            path = self.is_hei + os.path.sep + str(hei[i])
             img = self._get_img(path)
             imgs.append(img)
-            labels.append(self.IS_MIN)
+            labels.append(self.IS_HEI)
         # 苏-----------------------------------------------------------------------
         su = os.listdir(self.is_su)
         for i in range(len(su)):
