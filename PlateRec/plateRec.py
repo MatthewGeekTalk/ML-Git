@@ -160,9 +160,9 @@ class PlateRec(object):
             for key, value in char_dict.items():
                 if value == labels[i]:
                     self._plate_str += key
-                    print(key)
+                    # print(key)
 
-        print(self._plate_str)
+                    # print(self._plate_str)
 
     def __detect_plate_sobel(self):
         img_plate = []
@@ -298,6 +298,7 @@ if __name__ == '__main__':
         # plate_rec.save_plate(path2, plate)
 
     plate_rec.print_plate(plate_rec.img_con_sobel)
+    print(plate_rec.plate_string)
 
     # for plate in plate_rec.plate_with_no:
     #     for char in plate['value']:
