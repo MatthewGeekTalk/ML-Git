@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-
+import os
 
 class charsSegment:
     def __init__(self):
@@ -61,6 +61,8 @@ class charsSegment:
             width = char[i][1][1][1]
             if i == 0:
                 img_plate = img_threshold[0:img_threshold.shape[0], x1:x2]
+            elif i == 7:
+                continue
             else:
                 img_plate = img_threshold[y1:y2, x1:x2]
             result = self.verifyCharSizes(img_plate, height, width)
@@ -107,10 +109,12 @@ class charsSegment:
 
 
 if __name__ == '__main__':
-    img = cv2.imread('test.jpg')
+    img = cv2.imread('char0.jpg')
     charsSegment = charsSegment()
     img = charsSegment.read_img(img)
     chars = charsSegment.charsSegment(img, 'BLUE')
     for i in range(len(chars)):
         cv2.imshow('plates_' + str(i), chars[i])
+        set_path = os.path.abspath('../trainingchar1') + os.path.sep
+        cv2.imwrite(set_path + 'char' + str(i) + '.jpg', chars[i])
     cv2.waitKey(0)
