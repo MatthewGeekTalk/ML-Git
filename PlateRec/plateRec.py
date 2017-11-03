@@ -125,7 +125,7 @@ class PlateRec(object):
 
         self._plate_with_no = []
 
-        self._plate_str = ""
+        self._plate_str = []
 
     def main(self):
         self._plates_sobel, self._regions_sobel, self._plates_sobel_ori = self.__detect_plate_sobel()
@@ -148,21 +148,24 @@ class PlateRec(object):
         return self.__draw_contours(img=ori_img, plate_regions=regions)
 
     def __detect_char(self, plate):
+        plate_string = ""
         char_detect = charsSegment()
         char_img = char_detect.read_img(plate)
         chars = char_detect.charsSegment(char_img, 'BLUE')
 
         char_determine = CharDetermine()
 
-        imgs, labels = char_determine.main(chars)
-        for i in range(len(imgs)):
-            self.print_plate(imgs[i])
-            for key, value in char_dict.items():
-                if value == labels[i]:
-                    self._plate_str += key
-                    # print(key)
+        if len(chars) != 0:
+            imgs, labels = char_determine.main(chars)
+            for i in range(len(imgs)):
+                self.print_plate(imgs[i])
+                for key, value in char_dict.items():
+                    if value == labels[i]:
+                        plate_string += key
+                        print(key)
 
-                    # print(self._plate_str)
+                        print(plate_string)
+            self._plate_str.append(plate_string)
 
     def __detect_plate_sobel(self):
         img_plate = []
