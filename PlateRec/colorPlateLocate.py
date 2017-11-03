@@ -34,6 +34,7 @@ class ColorPlateLocate:
         self.rect = []
         self.safe_rect = []
         self.plates = []
+        self.plates_ori = []
         self.regions = []
 
         self.height = 0
@@ -94,6 +95,7 @@ class ColorPlateLocate:
 
         # resize plates for CNN
         for plate in plates:
+            self.plates_ori.append(plate)
             plate = self.__resize_plates(plate)
             self.plates.append(plate)
 
@@ -213,6 +215,9 @@ class ColorPlateLocate:
 
     def return_regions(self):
         return self.regions
+
+    def return_plates_ori(self):
+        return self.plates_ori
 
     def set_verify_value(self, verify_min, verify_max, verify_aspect, verify_error):
         self.verify_min = verify_min
