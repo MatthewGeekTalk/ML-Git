@@ -29,7 +29,7 @@ class tfrecords_reader_char:
         dataset = dataset.batch(batch)
         iterator = dataset.make_one_shot_iterator()
         image_batch, label_batch = iterator.get_next()
-        # imgs, lbls = self._get_data_label(features, batch)
+        # static, lbls = self._get_data_label(features, batch)
         with tf.Session() as sess:
             init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
             # init_op = tf.global_variables_initializer()
@@ -77,7 +77,7 @@ class tfrecords_reader_char:
     #
     #     return images, labels
 
-        # def _read_data(self, imgs, lbls):
+        # def _read_data(self, static, lbls):
         #     config = tf.ConfigProto()
         #     config.gpu_options.allow_growth = True
         #     with tf.Session(config=config) as sess:
@@ -85,7 +85,7 @@ class tfrecords_reader_char:
         #         sess.run(init_op)
         #         coord = tf.train.Coordinator()
         #         threads = tf.train.start_queue_runners(coord=coord)
-        #         images, labels = sess.run([imgs, lbls])
+        #         images, labels = sess.run([static, lbls])
         #         coord.request_stop()
         #         coord.join(threads)
         #     return images, labels
@@ -95,7 +95,7 @@ if __name__ == '__main__':
     path = os.path.abspath('../TFRecords')
     reader = tfrecords_reader_char(path)
     imgs, labels = reader.main(50)
-    # imgs, labels = reader.main(3137)
+    # static, labels = reader.main(3137)
     print(imgs.shape, labels.shape)
     plt.imshow(imgs[2])
     plt.show()
