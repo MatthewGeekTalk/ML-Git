@@ -131,18 +131,18 @@ class PlateRec(object):
     def main(self):
         self._plates_sobel, self._regions_sobel, self._plates_sobel_ori = self.__detect_plate_sobel()
         self._plates_sobel_ori = self.__resize_plates(imgs=self._plates_sobel_ori)
-        self._plates_color, self._regions_color, self._plates_color_ori = self.__detect_plate_color()
-        self._plates_color_ori = self.__resize_plates(imgs=self._plates_color_ori)
+        # self._plates_color, self._regions_color, self._plates_color_ori = self.__detect_plate_color()
+        # self._plates_color_ori = self.__resize_plates(imgs=self._plates_color_ori)
         self._img_con_sobel = self.__prepare_contours_img(regions=self._regions_sobel)
-        self._img_con_color = self.__prepare_contours_img(regions=self._regions_color)
+        # self._img_con_color = self.__prepare_contours_img(regions=self._regions_color)
 
-        if len(self._plates_sobel_ori) == len(self._plates_color_ori):
-            is_plates = self._plates_sobel_ori
-        else:
-            is_plates = self._plates_color_ori
+        # if len(self._plates_sobel_ori) == len(self._plates_color_ori):
+        #     is_plates = self._plates_sobel_ori
+        # else:
+        #     is_plates = self._plates_color_ori
 
-        for i in range(len(is_plates)):
-            self.__detect_char(is_plates[i])
+        for i in range(len(self._plates_sobel_ori)):
+            self.__detect_char(self._plates_sobel_ori[i])
 
     def __resize_plates(self, imgs):
         in_imgs = []
@@ -309,14 +309,14 @@ if __name__ == '__main__':
     for plate in plate_rec.plates_sobel_ori:
         plate_rec.print_plate(plate)
 
-    for plate in plate_rec.plates_color_ori:
-        plate_rec.print_plate(plate)
+    # for plate in plate_rec.plates_color_ori:
+    #     plate_rec.print_plate(plate)
 
         # path2 = input('Please input your saving path:')
         # plate_rec.save_plate(path2, plate)
 
     plate_rec.print_plate(plate_rec.img_con_sobel)
-    plate_rec.print_plate(plate_rec.img_con_color)
+    # plate_rec.print_plate(plate_rec.img_con_color)
     print(plate_rec.plate_string)
 
     # for plate in plate_rec.plate_with_no:
