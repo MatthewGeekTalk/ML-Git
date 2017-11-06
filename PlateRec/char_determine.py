@@ -3,7 +3,7 @@ import numpy as np
 import tensorflow as tf
 import cv2
 
-MODEL_PATH = os.path.abspath('./module/char-cnn')
+MODEL_PATH = os.path.abspath('./module/char-cnn/2000')
 GRAPH = 'char_classification_CNN.ckpt.meta'
 SESS = 'char_classification_CNN.ckpt'
 
