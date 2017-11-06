@@ -41,6 +41,8 @@ class PlateValidate(object):
         # This sess cause uninitialized error
         # need saver late since the pb file only contain graph information
         # Other weight need to be imported separately
+        # Sample please refer to:
+        # https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/tools/freeze_graph.py
 
         with tf.Session(graph=graph) as sess:
             x = sess.graph.get_tensor_by_name('prefix/x:0')
