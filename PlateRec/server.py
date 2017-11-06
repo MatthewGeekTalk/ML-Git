@@ -47,6 +47,8 @@ def rename_filename(old_file_name):
 
 
 def inference(file_name):
+    ret_string = ''
+
     img = cv2.imread(file_name, cv2.COLOR_BGR2RGB)
     plate_rec = PlateRec()
     plate_rec.img = img
@@ -55,20 +57,20 @@ def inference(file_name):
     img_path = os.path.abspath('./static')
     new_name = rename_filename(file_name)
     img_path = img_path + os.sep + new_name
-    Image.imsave(img_path, plate_rec.img_con_sobel)
+    if plate_rec.img_con_sobel is not None:
+        Image.imsave(img_path, plate_rec.img_con_sobel)
 
-    new_url = '/static/%s' % os.path.basename(img_path)
-    image_tag = '<img src="%s"></img><p>'
-    new_tag = image_tag % new_url
-    format_string = ''
-    # for node_id, human_name in zip(top_k, top_names):
-    #     score = predictions[node_id]
-    #     format_string += '%s (score:%.5f)<BR>' % (human_name, score)
-    # ret_string = new_tag + format_string + '<BR>'
-    for plate_str in plate_rec.plate_string:
-        format_string += 'Plate is %s' % plate_str
-    ret_string = new_tag + format_string + '<BR>'
-    return ret_string
+        new_url = '/static/%s' % os.path.basename(img_path)
+        image_tag = '<img src="%s"></img><p>'
+        new_tag = image_tag % new_url
+        format_string = ''
+        for plate_str in plate_rec.plate_string:
+            format_string += 'Plate is %s' % plate_str
+        ret_string = new_tag + format_string + '<BR>'
+        return ret_string
+    else:
+        ret_string += 'No plate inside picture<BR>'
+        return ret_string
 
 
 @app.route("/", methods=['GET', 'POST'])
