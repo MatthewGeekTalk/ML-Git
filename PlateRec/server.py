@@ -47,18 +47,14 @@ def rename_filename(old_file_name):
 
 
 def inference(file_name):
-    # try:
-    #     predictions, top_k, top_names = run_inference_on_image(file_name, model_file=FLAGS.model_name)
-    #     print(predictions)
-    # except Exception as ex:
-    #     print(ex)
-    #     return ""
     img = cv2.imread(file_name, cv2.COLOR_BGR2RGB)
     plate_rec = PlateRec()
     plate_rec.img = img
-
     plate_rec.main()
-    img_path = os.path.abspath('./static/plate.jpg')
+
+    img_path = os.path.abspath('./static')
+    new_name = rename_filename(file_name)
+    img_path = img_path + os.sep + new_name
     Image.imsave(img_path, plate_rec.img_con_sobel)
 
     new_url = '/static/%s' % os.path.basename(img_path)
@@ -94,8 +90,6 @@ def root():
             filename = rename_filename(old_file_name)
             file_path = os.path.join(UPLOAD_FOLDER, filename)
             file.save(file_path)
-            # type_name = 'N/A'
-            # print('file saved to %s' % file_path)
             out_html = inference(file_path)
 
             return result + out_html
