@@ -8,7 +8,7 @@ export_path = os.path.abspath('../frozen_module/bc-cnn2')
 def main():
     dir(tf.contrib)
     graph = tf.get_default_graph()
-    with tf.Session() as sess:
+    with tf.Session(graph=tf.Graph()) as sess:
         saver = tf.train.import_meta_graph(import_path + '/binary_classification_CNN.ckpt.meta')
         saver.restore(sess, import_path + '/binary_classification_CNN.ckpt')
 
