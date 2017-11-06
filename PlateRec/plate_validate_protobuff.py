@@ -38,7 +38,9 @@ class PlateValidate(object):
         graph = self.__load_graph(FREEZE_MODEL_PATH \
                                   + '/binary_classification_CNN.pb')
 
-        # saver = tf.train.Saver(tf.all_variables())
+        # This sess cause uninitialized error
+        # need saver late since the pb file only contain graph information
+        # Other weight need to be imported separately
 
         with tf.Session(graph=graph) as sess:
             x = sess.graph.get_tensor_by_name('prefix/x:0')
