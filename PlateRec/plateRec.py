@@ -132,7 +132,7 @@ class PlateRec(object):
         self._plates_sobel, self._regions_sobel, self._plates_sobel_ori = self.__detect_plate_sobel()
         self._plates_sobel_ori = self.__resize_plates(imgs=self._plates_sobel_ori)
         # self._plates_color, self._regions_color, self._plates_color_ori = self.__detect_plate_color()
-        # self._plates_color_ori = self.__resize_plates(imgs=self._plates_color_ori)
+        # self._plates_color_ori = self.__resize_plates(static=self._plates_color_ori)
         self._img_con_sobel = self.__prepare_contours_img(regions=self._regions_sobel)
         # self._img_con_color = self.__prepare_contours_img(regions=self._regions_color)
 
@@ -166,13 +166,13 @@ class PlateRec(object):
         if len(chars) != 0:
             imgs, labels = char_determine.main(chars)
             for i in range(len(imgs)):
-                self.print_plate(imgs[i])
+                # self.print_plate(imgs[i])
                 for key, value in char_dict.items():
                     if value == labels[i]:
                         plate_string += key
-                        print(key)
+                        # print(key)
 
-                        print(plate_string)
+                        # print(plate_string)
             self._plate_str.append(plate_string)
 
     def __detect_plate_sobel(self):

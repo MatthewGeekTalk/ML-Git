@@ -36,7 +36,7 @@ class Crawler:
             os.mkdir("./" + 'BaiduPlates')
         # 判断名字是否重复，获取图片长度
         self.__counter = len(os.listdir('./' + word)) + 1
-        for image_info in rsp_data['imgs']:
+        for image_info in rsp_data['static']:
             try:
                 time.sleep(self.time_sleep)
                 fix = self.__get_suffix(image_info['objURL'])
