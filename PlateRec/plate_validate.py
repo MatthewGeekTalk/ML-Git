@@ -73,8 +73,8 @@ if __name__ == '__main__':
         # name_list.append(plates[i])
         img_list.append(img)
 
-    plate_validate = PlateValidate(img_list)
-    imgs, labels = plate_validate.main()
+    plate_validate = PlateValidate()
+    imgs, labels = plate_validate.main(img_list)
 
     print(labels)
     print(imgs)
