@@ -1,34 +1,13 @@
 # coding=utf-8
 import os
-import sys
-import time
-from flask import request, send_from_directory
-from flask import Flask, request, redirect, url_for
+from flask import Flask, request
 import uuid
 import cv2
 import matplotlib.image as Image
-import tensorflow as tf
-# from classify_image import run_inference_on_image
 from plateRec import PlateRec
 
-ALLOWED_EXTENSIONS = set(['jpg', 'JPG', 'jpeg', 'JPEG', 'png'])
-
-# FLAGS = tf.app.flags.FLAGS
-#
-# tf.app.flags.DEFINE_string('model_dir', '', """Path to graph_def pb, """)
-# tf.app.flags.DEFINE_string('model_name', 'my_inception_v4_freeze.pb', '')
-# tf.app.flags.DEFINE_string('label_file', 'my_inception_v4_freeze.label', '')
-# tf.app.flags.DEFINE_string('upload_folder', '/tmp/', '')
-# tf.app.flags.DEFINE_integer('num_top_predictions', 5,
-#                             """Display this many predictions.""")
-# tf.app.flags.DEFINE_integer('port', '5001',
-#                             'server with port,if no port, use deault port 80')
-#
-# tf.app.flags.DEFINE_boolean('debug', False, '')
-
+ALLOWED_EXTENSIONS = ['jpg', 'JPG', 'jpeg', 'JPEG', 'png']
 UPLOAD_FOLDER = os.path.abspath('./static')
-
-ALLOWED_EXTENSIONS = set(['jpg', 'JPG', 'jpeg', 'JPEG', 'png'])
 
 app = Flask(__name__)
 app._static_folder = UPLOAD_FOLDER
