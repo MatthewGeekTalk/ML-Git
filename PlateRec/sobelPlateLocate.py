@@ -312,6 +312,8 @@ class SobelPlateLocate(object):
         try:
             for i in range(len(self.plates)):
                 cv2.imshow('plates_' + str(i), self.plates[i])
+                set_path = os.path.abspath('../trainingchar1') + os.path.sep
+                cv2.imwrite(set_path + 'char' + str(i) + '.jpg', self.plates[i])
         except Exception:
             pass
         cv2.waitKey(0)
@@ -325,7 +327,7 @@ if __name__ == '__main__':
 
     plate_locate = SobelPlateLocate()
     plate_locate.read_img(img)
-    plate_locate.set_size(20, 72)
+    plate_locate.set_size(50, 180)
     plate_locate.set_gaussian_size(5)
     plate_locate.set_morph_hw(17, 3)
     plate_locate.set_verify_value(1, 100, 4, .5)

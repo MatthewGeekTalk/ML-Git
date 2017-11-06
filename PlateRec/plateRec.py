@@ -101,7 +101,7 @@ char_dict = {
           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0],
     '辽': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
-    '闽': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    '黑': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
 }
 
@@ -139,10 +139,11 @@ class PlateRec(object):
         # if len(self._plates_sobel_ori) == len(self._plates_color_ori):
         #     is_plates = self._plates_sobel_ori
         # else:
-        #     is_plates = self._plates_color_ori
+            # is_plates = self._plates_color_ori
+        is_plates = self._plates_sobel_ori
 
-        for i in range(len(self._plates_sobel_ori)):
-            self.__detect_char(self._plates_sobel_ori[i])
+        for i in range(len(is_plates)):
+            self.__detect_char(is_plates[i])
 
     def __resize_plates(self, imgs):
         in_imgs = []
