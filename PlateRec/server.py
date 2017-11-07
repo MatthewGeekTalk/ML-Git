@@ -37,7 +37,8 @@ def inference(file_name):
     new_name = rename_filename(file_name)
     img_path = img_path + os.sep + new_name
     if plate_rec.img_con_sobel is not None:
-        Image.imsave(img_path, plate_rec.img_con_sobel)
+        plate = cv2.cvtColor(plate_rec.img_con_sobel, cv2.COLOR_BGR2RGB)
+        Image.imsave(img_path, plate)
 
         new_url = '/static/%s' % os.path.basename(img_path)
         image_tag = '<img src="%s"></img><p>'
