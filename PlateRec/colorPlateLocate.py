@@ -230,6 +230,8 @@ class ColorPlateLocate:
         try:
             for i in range(len(self.plates)):
                 cv2.imshow('plates_' + str(i), self.plates[i])
+                set_path = os.path.abspath('../trainingchar1') + os.path.sep
+                cv2.imwrite(set_path + 'char_c' + str(i) + '.jpg', self.plates[i])
         except Exception:
             pass
         cv2.waitKey(0)
