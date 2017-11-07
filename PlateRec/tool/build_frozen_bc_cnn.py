@@ -18,8 +18,8 @@ def main():
         # for node in graph.as_graph_def().node:
         #     output_node_names = str(output_node_names) + str(node.name) + ','
 
-        output_graph_def = tf.graph_util.convert_variables_to_constants(sess,tf.get_default_graph().as_graph_def(),
-                                                                         output_node_names.split(","))
+        output_graph_def = tf.graph_util.convert_variables_to_constants(sess, tf.get_default_graph().as_graph_def(),
+                                                                        output_node_names.split(","))
 
         with tf.gfile.GFile(output_graph, "wb") as f:
             f.write(output_graph_def.SerializeToString())
@@ -28,6 +28,7 @@ def main():
         # tf.train.write_graph(sess.graph_def, export_path, "binary_classification_CNN.pb", False)
         # tf.train.write_graph(sess.graph_def, export_path, "binary_classification_CNN.pbtxt", True)
     return output_graph_def
+
 
 if __name__ == '__main__':
     main()
