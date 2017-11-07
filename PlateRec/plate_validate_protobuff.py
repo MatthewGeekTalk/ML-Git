@@ -36,7 +36,7 @@ class PlateValidate(object):
 
     def __plate_validate(self):
         graph = self.__load_graph(FREEZE_MODEL_PATH \
-                                  + '/binary_classification_CNN.pb')
+                                  + '/frozen_model.pb')
 
         # This sess cause uninitialized error
         # need saver late since the pb file only contain graph information
