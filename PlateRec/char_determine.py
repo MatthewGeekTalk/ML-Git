@@ -22,9 +22,10 @@ class CharDetermine(object):
         imgs_list = []
 
         for img in imgs:
-            img = cv2.resize(img, (28, 28), interpolation=cv2.INTER_CUBIC)
-            img = np.reshape(img, [-1, 784])
-            imgs_list.append(img)
+            if img.shape[0] >0 and img.shape[1]>0:
+                img = cv2.resize(img, (28, 28), interpolation=cv2.INTER_CUBIC)
+                img = np.reshape(img, [-1, 784])
+                imgs_list.append(img)
         return imgs_list
 
     def __char_detection(self):

@@ -165,14 +165,11 @@ class PlateRec(object):
 
         if len(chars) != 0:
             imgs, labels = char_determine.main(chars)
-            for i in range(len(imgs)):
-                # self.print_plate(imgs[i])
-                for key, value in char_dict.items():
-                    if value == labels[i]:
-                        plate_string += key
-                        # print(key)
-
-                        # print(plate_string)
+            if len(imgs) == len(labels):
+                for i in range(len(imgs)):
+                    for key, value in char_dict.items():
+                        if value == labels[i]:
+                            plate_string += key
             self._plate_str.append(plate_string)
 
     def __detect_plate_sobel(self):
