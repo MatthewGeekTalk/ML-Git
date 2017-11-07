@@ -7,9 +7,9 @@ import matplotlib.image as Image
 sys.path.insert(0, os.path.abspath('./'))
 from sobelPlateLocate import SobelPlateLocate
 from colorPlateLocate import ColorPlateLocate
-from plate_validate import PlateValidate
+from plate_validate_protobuff import PlateValidate
 from charsSegment import charsSegment
-from char_determine import CharDetermine
+from char_determine_protobuff import CharDetermine
 
 IS_PLATE = [0, 1]
 char_dict = {
