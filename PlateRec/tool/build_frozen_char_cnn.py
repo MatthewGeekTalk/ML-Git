@@ -1,7 +1,7 @@
 import tensorflow as tf
 import os
 
-IMPORT_PATH = os.path.abspath('../module/char-cnn/2000')
+IMPORT_PATH = os.path.abspath('../module/char-cnn/2000_2')
 EXPORT_PATH = os.path.abspath('../frozen_module/char-cnn')
 
 

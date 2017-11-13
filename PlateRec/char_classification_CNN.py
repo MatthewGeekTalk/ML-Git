@@ -191,6 +191,7 @@ if __name__ == '__main__':
         init_op = tf.group(tf.local_variables_initializer(), tf.global_variables_initializer())
         # init_op = tf.global_variables_initializer()
         sess.run(init_op)
+        writer = tf.summary.FileWriter("/nfs/users/matthew/saved_model/", sess.graph)
         for i in range(2000):
             imgs, labels = reader.main(batch=BATCH_SIZE)
             imgs = np.reshape(imgs, [BATCH_SIZE, 28 * 28])
@@ -203,3 +204,4 @@ if __name__ == '__main__':
         # writer.close()
         save_path = saver.save(sess, MODEL_PATH)
         print('Model save at %s' % save_path)
+        writer.close()
