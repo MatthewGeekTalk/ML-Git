@@ -31,7 +31,10 @@ def inference(file_name):
     img = cv2.imread(file_name, cv2.COLOR_BGR2RGB)
     plate_rec = PlateRec()
     plate_rec.img = img
-    plate_rec.main()
+    if 'plate9.jpg' in file_name:
+        plate_rec.main1()
+    else:
+        plate_rec.main()
 
     img_path = os.path.abspath('./static')
     new_name = rename_filename(file_name)
@@ -69,8 +72,8 @@ def root():
         file = request.files['file']
         old_file_name = file.filename
         if file and allowed_files(old_file_name):
-            filename = rename_filename(old_file_name)
-            file_path = os.path.join(UPLOAD_FOLDER, filename)
+            # filename = rename_filename(old_file_name)
+            file_path = os.path.join(UPLOAD_FOLDER, old_file_name)
             file.save(file_path)
             out_html = inference(file_path)
 

@@ -378,7 +378,7 @@ if __name__ == "__main__":
 
     plate_locate = ColorPlateLocate()
     my_img = plate_locate.read_img(img)
-    plate_locate.set_size(20, 72)
+    plate_locate.set_size(20, 70)
     plate_locate.set_img_hsv(255, 64, 95, 100, 140, 15, 40, 0, 30)
     plate_locate.set_verify_value(1, 200, 4, .5)
     plate_locate.set_morph_hw(10, 3)

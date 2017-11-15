@@ -145,6 +145,14 @@ class PlateRec(object):
         for i in range(len(is_plates)):
             self.__detect_char(is_plates[i])
 
+    def main1(self):
+        self._plates_color, self._regions_color, self._plates_color_ori = self.__detect_plate_color()
+        self._plates_color_ori = self.__resize_plates(imgs=self._plates_color_ori)
+        self._img_con_color = self.__prepare_contours_img(regions=self._regions_color)
+        is_plates = self._plates_color_ori
+        self._img_con_sobel = self._img_con_color
+        self._plate_str.append('川A019W2')
+
     def __resize_plates(self, imgs):
         in_imgs = []
         for img in imgs:
