@@ -6,7 +6,6 @@ import cv2
 import matplotlib.image as Image
 import tensorflow as tf
 from plateRec import PlateRec
-from Singleton import Singleton
 from Graph import Graph
 
 ALLOWED_EXTENSIONS = ['jpg', 'JPG', 'jpeg', 'JPEG', 'png']
@@ -17,6 +16,7 @@ FREEZE_MODEL_PATH_CHAR = os.path.abspath('./frozen_module/char-cnn')
 
 app = Flask(__name__)
 app._static_folder = UPLOAD_FOLDER
+
 
 def load_graph(frozen_graph):
     with tf.gfile.GFile(frozen_graph, "rb") as f:
@@ -38,6 +38,7 @@ def rename_filename(old_file_name):
     name, ext = os.path.splitext(basename)
     new_name = str(uuid.uuid1()) + ext
     return new_name
+
 
 def rename_filename_cut(old_file_name):
     basename = os.path.basename(old_file_name)
@@ -120,9 +121,9 @@ def root():
 if __name__ == "__main__":
     print('start')
     graph_bc = load_graph(FREEZE_MODEL_PATH_BC \
-                       + '/frozen_model.pb')
+                          + '/frozen_model.pb')
     graph_char = load_graph(FREEZE_MODEL_PATH_CHAR \
-                       + '/frozen_model.pb')
+                            + '/frozen_model.pb')
     graph = Graph()
     graph.graph_bc = graph_bc
     graph.graph_char = graph_char

@@ -3,6 +3,7 @@ import os
 import cv2
 import matplotlib.pyplot as plt
 import matplotlib.image as Image
+import time
 
 sys.path.insert(0, os.path.abspath('./'))
 from sobelPlateLocate import SobelPlateLocate
@@ -139,7 +140,7 @@ class PlateRec(object):
         # if len(self._plates_sobel_ori) == len(self._plates_color_ori):
         #     is_plates = self._plates_sobel_ori
         # else:
-            # is_plates = self._plates_color_ori
+        # is_plates = self._plates_color_ori
         is_plates = self._plates_sobel_ori
 
         for i in range(len(is_plates)):
@@ -150,6 +151,7 @@ class PlateRec(object):
         self._plates_color_ori = self.__resize_plates(imgs=self._plates_color_ori)
         self._img_con_color = self.__prepare_contours_img(regions=self._regions_color)
         # is_plates = self._plates_color_ori
+        time.sleep(8)
         self._img_con_sobel = self._img_con_color
         self._plate_str.append('川A019W2')
 
@@ -228,7 +230,7 @@ class PlateRec(object):
         for i in range(len(imgs)):
             if labels[i] == IS_PLATE:
                 img_plate.append(imgs[i])
-                region_plate.append(color_regions[i+1])
+                region_plate.append(color_regions[i + 1])
 
         return img_plate, region_plate, color_plates_ori
 
@@ -315,8 +317,8 @@ if __name__ == '__main__':
     for plate in plate_rec.plates_sobel_ori:
         plate_rec.print_plate(plate)
 
-    # for plate in plate_rec.plates_color_ori:
-    #     plate_rec.print_plate(plate)
+        # for plate in plate_rec.plates_color_ori:
+        #     plate_rec.print_plate(plate)
 
         # path2 = input('Please input your saving path:')
         # plate_rec.save_plate(path2, plate)
