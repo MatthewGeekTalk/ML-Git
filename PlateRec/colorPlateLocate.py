@@ -34,6 +34,8 @@ class ColorPlateLocate:
         self.rect = []
         self.safe_rect = []
         self.plates = []
+        self.plates_ori = []
+        self.regions = []
 
         self.height = 0
         self.width = 0
@@ -45,8 +47,8 @@ class ColorPlateLocate:
         self.height = height
         self.width = width
 
-    def read_img(self, img_path):
-        self.img = cv2.imread(img_path)
+    def read_img(self, img):
+        self.img = img
         self.imgOrg = self.img.copy()
         return self.img
 
@@ -87,14 +89,17 @@ class ColorPlateLocate:
         min_h, max_h = self.__set_min_max(case)
         img = cv2.inRange(img, min_h, max_h)
         img = self.__img_morph_close(img)
-        region = self.__find_plate_number_region(img)
+        region, box = self.__find_plate_number_region(img)
         plates = self.__detect_region(region, self.imgOrg)
         plates = self.__split_plate(plates, case)
 
         # resize plates for CNN
         for plate in plates:
+            self.plates_ori.append(plate)
             plate = self.__resize_plates(plate)
             self.plates.append(plate)
+
+        self.regions = box
 
     def set_morph_hw(self, morph_w, morph_h):
         self.morphW = morph_w
@@ -208,6 +213,12 @@ class ColorPlateLocate:
     def return_plates(self):
         return self.plates
 
+    def return_regions(self):
+        return self.regions
+
+    def return_plates_ori(self):
+        return self.plates_ori
+
     def set_verify_value(self, verify_min, verify_max, verify_aspect, verify_error):
         self.verify_min = verify_min
         self.verify_max = verify_max
@@ -219,6 +230,8 @@ class ColorPlateLocate:
         try:
             for i in range(len(self.plates)):
                 cv2.imshow('plates_' + str(i), self.plates[i])
+                set_path = os.path.abspath('../trainingchar1') + os.path.sep
+                cv2.imwrite(set_path + 'char_c' + str(i) + '.jpg', self.plates[i])
         except Exception:
             pass
         cv2.waitKey(0)
@@ -235,6 +248,7 @@ class ColorPlateLocate:
 
     def __find_plate_number_region(self, img):
         region = []
+        safe_box = []
         img_find = img.copy()
         im2, contours, hierarchy = cv2.findContours(img_find, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
         for i in range(len(contours)):
@@ -258,7 +272,8 @@ class ColorPlateLocate:
                 continue
             angel = (safe_rect, rect)
             region.append(angel)
-        return region
+            safe_box.append(box)
+        return region, safe_box
 
     @staticmethod
     def __check_angle(height, width, angle):
@@ -358,14 +373,18 @@ if __name__ == "__main__":
 
     print("Image path: %s" % str(os.path.abspath('../Material') + os.path.sep).replace('\\', '\\\\'))
     path = input("Please input your image path:")
+
+    img = cv2.imread(path)
+
     plate_locate = ColorPlateLocate()
-    my_img = plate_locate.read_img(path)
-    plate_locate.set_size(20, 72)
+    my_img = plate_locate.read_img(img)
+    plate_locate.set_size(20, 70)
     plate_locate.set_img_hsv(255, 64, 95, 100, 140, 15, 40, 0, 30)
     plate_locate.set_verify_value(1, 200, 4, .5)
     plate_locate.set_morph_hw(10, 3)
     plate_locate.plate_locate(my_img, "BLUE")
     temp_plates = plate_locate.return_plates()
+    temp_regions = plate_locate.return_regions()
     plate_locate.img_show()
     # for i in range(len(temp_plates)):
     #     cv2.imwrite(os.path.abspath('../local') + os.path.sep + 'plates_' + str(i) + '.png',

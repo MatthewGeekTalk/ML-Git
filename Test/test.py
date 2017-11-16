@@ -2,24 +2,16 @@ import cv2
 import numpy as np
 
 img = object
-img = cv2.imread('C:\\Users\\i072179\\PycharmProjects\\ML-Git\\Material\\plate1.jpg')
+img = cv2.imread('00.jpg')
 imgOrg = img.copy()
-img = cv2.GaussianBlur(img, (5, 5), 0, 0, cv2.BORDER_DEFAULT)
-img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-img = cv2.Sobel(img, cv2.CV_8U, 1, 0, ksize=3)
-ret, img = cv2.threshold(img, 0, 255, cv2.THRESH_OTSU + cv2.THRESH_BINARY)
-element = cv2.getStructuringElement(cv2.MORPH_RECT, (17, 3))
-img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, element)
-im2, contours, hierarchy = cv2.findContours(img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+img_gay = cv2.cvtColor(imgOrg, cv2.COLOR_BGR2GRAY)
+BLUE_MIN = np.array([0, 0, 0], np.uint8)
+BLUE_MAX = np.array([255, 255, 50], np.uint8)
 
-cnt = contours[4]
-print(cnt)
-
-rect = cv2.minAreaRect(cnt)
-box = cv2.boxPoints(rect)
-box = np.int0(box)
-cv2.drawContours(im2, contours, 0, (0, 0, 255), 3)
-
-cv2.imshow('im2', im2)
-cv2.waitKey(0)
-
+dst = cv2.inRange(img, BLUE_MIN, BLUE_MAX)
+print(img_gay.shape, dst.shape)
+z = cv2.countNonZero(dst)
+print(z)
+# ret,img_thre = cv2.threshold(img_gay,0,255,cv2.THRESH_OTSU + cv2.THRESH_BINARY)
+# cv2.imshow('im2', img_thre)
+# cv2.waitKey(0)
