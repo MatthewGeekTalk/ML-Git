@@ -2,6 +2,7 @@ import tensorflow as tf
 import os
 import cv2
 import numpy as np
+from Graph import Graph
 
 FREEZE_MODEL_PATH = os.path.abspath('./frozen_module/bc-cnn2')
 
@@ -35,16 +36,16 @@ class PlateValidate(object):
         return graph
 
     def __plate_validate(self):
-        graph = self.__load_graph(FREEZE_MODEL_PATH \
-                                  + '/frozen_model.pb')
-
+        # graph = self.__load_graph(FREEZE_MODEL_PATH \
+        #                           + '/frozen_model.pb')
+        graph = Graph()
         # This sess cause uninitialized error
         # need saver late since the pb file only contain graph information
         # Other weight need to be imported separately
         # Sample please refer to:
         # https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/tools/freeze_graph.py
 
-        with tf.Session(graph=graph) as sess:
+        with tf.Session(graph=graph.graph_bc) as sess:
             x = sess.graph.get_tensor_by_name('prefix/x:0')
             y = sess.graph.get_tensor_by_name('prefix/output/predict_sm:0')
             keep_prob = sess.graph.get_tensor_by_name('prefix/keep_prob:0')

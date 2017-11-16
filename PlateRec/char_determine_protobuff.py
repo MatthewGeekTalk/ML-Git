@@ -2,6 +2,7 @@ import tensorflow as tf
 import os
 import cv2
 import numpy as np
+from Graph import Graph
 
 FREEZE_MODEL_PATH = os.path.abspath('./frozen_module/char-cnn')
 
@@ -37,10 +38,11 @@ class CharDetermine(object):
         return graph
 
     def __char_detection(self):
-        graph = self.__load_graph(FREEZE_MODEL_PATH + \
-                                  '/frozen_model.pb')
+        # graph = self.__load_graph(FREEZE_MODEL_PATH + \
+        #                           '/frozen_model.pb')
+        graph = Graph()
 
-        with tf.Session(graph=graph) as sess:
+        with tf.Session(graph=graph.graph_char) as sess:
             x = sess.graph.get_tensor_by_name('prefix/x:0')
             y = sess.graph.get_tensor_by_name('prefix/output/predict_sm:0')
             keep_prob = sess.graph.get_tensor_by_name('prefix/keep_prob:0')

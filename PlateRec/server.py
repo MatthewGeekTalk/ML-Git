@@ -4,13 +4,28 @@ from flask import Flask, request
 import uuid
 import cv2
 import matplotlib.image as Image
+import tensorflow as tf
 from plateRec import PlateRec
+from Singleton import Singleton
+from Graph import Graph
 
 ALLOWED_EXTENSIONS = ['jpg', 'JPG', 'jpeg', 'JPEG', 'png']
 UPLOAD_FOLDER = os.path.abspath('./static')
 
+FREEZE_MODEL_PATH_BC = os.path.abspath('./frozen_module/bc-cnn2')
+FREEZE_MODEL_PATH_CHAR = os.path.abspath('./frozen_module/char-cnn')
+
 app = Flask(__name__)
 app._static_folder = UPLOAD_FOLDER
+
+def load_graph(frozen_graph):
+    with tf.gfile.GFile(frozen_graph, "rb") as f:
+        graph_def = tf.GraphDef()
+        graph_def.ParseFromString(f.read())
+
+    with tf.Graph().as_default() as graph:
+        tf.import_graph_def(graph_def, name='prefix')
+    return graph
 
 
 def allowed_files(filename):
@@ -103,5 +118,13 @@ def root():
 
 
 if __name__ == "__main__":
+    print('start')
+    graph_bc = load_graph(FREEZE_MODEL_PATH_BC \
+                       + '/frozen_model.pb')
+    graph_char = load_graph(FREEZE_MODEL_PATH_CHAR \
+                       + '/frozen_model.pb')
+    graph = Graph()
+    graph.graph_bc = graph_bc
+    graph.graph_char = graph_char
     print('listening on port 50050')
     app.run(host='0.0.0.0', port=50050)
