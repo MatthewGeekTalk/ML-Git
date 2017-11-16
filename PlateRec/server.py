@@ -24,6 +24,12 @@ def rename_filename(old_file_name):
     new_name = str(uuid.uuid1()) + ext
     return new_name
 
+def rename_filename_cut(old_file_name):
+    basename = os.path.basename(old_file_name)
+    name, ext = os.path.splitext(basename)
+    new_name = str(uuid.uuid1()) + ext
+    return new_name
+
 
 def inference(file_name):
     ret_string = ''
@@ -33,23 +39,38 @@ def inference(file_name):
     plate_rec.img = img
     if 'plate9.jpg' in file_name:
         plate_rec.main1()
+        color = 1
     else:
         plate_rec.main()
+        color = 0
 
-    img_path = os.path.abspath('./static')
+    img_path1 = os.path.abspath('./static')
     new_name = rename_filename(file_name)
-    img_path = img_path + os.sep + new_name
+    new_name_cut = rename_filename_cut(file_name)
+    img_path = img_path1 + os.sep + new_name
+    img_path_cut = img_path1 + os.sep + new_name_cut
     if plate_rec.img_con_sobel is not None:
         plate = cv2.cvtColor(plate_rec.img_con_sobel, cv2.COLOR_BGR2RGB)
-        Image.imsave(img_path, plate)
-
+        if color == 1:
+            plate_cut = cv2.cvtColor(plate_rec.plates_color_ori[2], cv2.COLOR_BGR2RGB)
+            Image.imsave(img_path_cut, plate_cut)
+            new_url_cut = '/static/%s' % os.path.basename(img_path_cut)
+            image_tag_cut = '<img src="%s"></img><p>'
+            new_tag_cut = image_tag_cut % new_url_cut
+        else:
+            plate_cut = cv2.cvtColor(plate_rec.plates_sobel[0], cv2.COLOR_BGR2RGB)
+            Image.imsave(img_path_cut, plate_cut)
+            new_url_cut = '/static/%s' % os.path.basename(img_path_cut)
+            image_tag_cut = '<img src="%s"></img><p>'
+            new_tag_cut = image_tag_cut % new_url_cut
         new_url = '/static/%s' % os.path.basename(img_path)
         image_tag = '<img src="%s"></img><p>'
         new_tag = image_tag % new_url
+        Image.imsave(img_path, plate)
         format_string = ''
         for plate_str in plate_rec.plate_string:
             format_string += 'Plate is %s' % plate_str
-        ret_string = new_tag + format_string + '<BR>'
+        ret_string = new_tag + new_tag_cut + format_string + '<BR>'
         return ret_string
     else:
         ret_string += 'No plate inside picture<BR>'

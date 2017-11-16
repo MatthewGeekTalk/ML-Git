@@ -149,7 +149,7 @@ class PlateRec(object):
         self._plates_color, self._regions_color, self._plates_color_ori = self.__detect_plate_color()
         self._plates_color_ori = self.__resize_plates(imgs=self._plates_color_ori)
         self._img_con_color = self.__prepare_contours_img(regions=self._regions_color)
-        is_plates = self._plates_color_ori
+        # is_plates = self._plates_color_ori
         self._img_con_sobel = self._img_con_color
         self._plate_str.append('川A019W2')
 
@@ -187,7 +187,7 @@ class PlateRec(object):
 
         plate_sobel = SobelPlateLocate()
         plate_sobel.read_img(self._img)
-        plate_sobel.set_size(20, 72)
+        plate_sobel.set_size(20, 70)
         plate_sobel.set_gaussian_size(5)
         plate_sobel.set_morph_hw(17, 3)
         plate_sobel.set_verify_value(1, 100, 4, .5)
@@ -213,7 +213,7 @@ class PlateRec(object):
 
         plate_color = ColorPlateLocate()
         img = plate_color.read_img(self._img)
-        plate_color.set_size(20, 72)
+        plate_color.set_size(20, 70)
         plate_color.set_img_hsv(255, 64, 95, 100, 140, 15, 40, 0, 30)
         plate_color.set_verify_value(1, 200, 4, .5)
         plate_color.set_morph_hw(10, 3)
@@ -228,7 +228,7 @@ class PlateRec(object):
         for i in range(len(imgs)):
             if labels[i] == IS_PLATE:
                 img_plate.append(imgs[i])
-                region_plate.append(color_regions[i])
+                region_plate.append(color_regions[i+1])
 
         return img_plate, region_plate, color_plates_ori
 
@@ -322,6 +322,7 @@ if __name__ == '__main__':
         # plate_rec.save_plate(path2, plate)
 
     plate_rec.print_plate(plate_rec.img_con_sobel)
+    plate_rec.print_plate(plate_rec.plates_color)
     # plate_rec.print_plate(plate_rec.img_con_color)
     print(plate_rec.plate_string)
 
