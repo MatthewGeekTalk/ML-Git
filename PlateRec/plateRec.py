@@ -151,7 +151,6 @@ class PlateRec(object):
         self._plates_color_ori = self.__resize_plates(imgs=self._plates_color_ori)
         self._img_con_color = self.__prepare_contours_img(regions=self._regions_color)
         # is_plates = self._plates_color_ori
-        time.sleep(8)
         self._img_con_sobel = self._img_con_color
         self._plate_str.append('川A019W2')
 
