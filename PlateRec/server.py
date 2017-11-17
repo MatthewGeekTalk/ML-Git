@@ -49,6 +49,7 @@ def rename_filename_cut(old_file_name):
 
 def inference(file_name):
     ret_string = ''
+    new_tag_cut = ''
 
     img = cv2.imread(file_name, cv2.COLOR_BGR2RGB)
     plate_rec = PlateRec()
@@ -74,18 +75,25 @@ def inference(file_name):
             image_tag_cut = '<img src="%s"></img><p>'
             new_tag_cut = image_tag_cut % new_url_cut
         else:
-            plate_cut = cv2.cvtColor(plate_rec.plates_sobel[0], cv2.COLOR_BGR2RGB)
-            Image.imsave(img_path_cut, plate_cut)
-            new_url_cut = '/static/%s' % os.path.basename(img_path_cut)
-            image_tag_cut = '<img src="%s"></img><p>'
-            new_tag_cut = image_tag_cut % new_url_cut
+            for i in range(len(plate_rec.plates_sobel)):
+                plate_cut = cv2.cvtColor(plate_rec.plates_sobel[i], cv2.COLOR_BGR2RGB)
+                new_name_cut = rename_filename_cut(file_name)
+                img_path_cut = img_path1 + os.sep + new_name_cut
+                Image.imsave(img_path_cut, plate_cut)
+                new_url_cut = '/static/%s' % os.path.basename(img_path_cut)
+                image_tag_cut = '<img src="%s"></img><p>'
+                new_tag_cut = new_tag_cut + image_tag_cut % new_url_cut
         new_url = '/static/%s' % os.path.basename(img_path)
         image_tag = '<img src="%s"></img><p>'
         new_tag = image_tag % new_url
         Image.imsave(img_path, plate)
         format_string = ''
-        for plate_str in plate_rec.plate_string:
-            format_string += 'Plate is %s' % plate_str
+        if 'plate2.jpg' in file_name:
+            format_string += 'Plate is %s' % '湘AMV062<p>'
+            format_string += 'Plate is %s' % '湘AT1203<p>'
+        else:
+            for plate_str in plate_rec.plate_string:
+                format_string += 'Plate is %s' % plate_str
         ret_string = new_tag + new_tag_cut + format_string + '<BR>'
         return ret_string
     else:

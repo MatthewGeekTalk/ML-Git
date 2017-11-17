@@ -240,7 +240,7 @@ class SobelPlateLocate(object):
         bottom = np.int0(box.shape[0] * 0.1)
         left = np.int0(box.shape[1] * 0.1)
         right = np.int0(box.shape[1] * 0.1)
-        rect_bound = cv2.copyMakeBorder(box, top, bottom, left, right, cv2.BORDER_CONSTANT, value=[255, 255, 255])
+        rect_bound = cv2.copyMakeBorder(box, top, bottom, left, right, cv2.BORDER_CONSTANT, value=[0, 0, 0])
         return rect_bound
 
     @staticmethod

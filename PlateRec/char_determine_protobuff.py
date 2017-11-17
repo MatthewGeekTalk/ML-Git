@@ -51,7 +51,7 @@ class CharDetermine(object):
         for i in range(len(self.in_imgs)):
             logits = sess.run(y, feed_dict={
                 x: self.in_imgs[i],
-                keep_prob: .5
+                keep_prob: 1.0
             })
 
             logits = np.reshape(logits, [45])

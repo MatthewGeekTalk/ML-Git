@@ -189,7 +189,7 @@ class PlateRec(object):
 
         plate_sobel = SobelPlateLocate()
         plate_sobel.read_img(self._img)
-        plate_sobel.set_size(20, 70)
+        plate_sobel.set_size(50, 180)
         plate_sobel.set_gaussian_size(5)
         plate_sobel.set_morph_hw(17, 3)
         plate_sobel.set_verify_value(1, 100, 4, .5)
@@ -215,7 +215,7 @@ class PlateRec(object):
 
         plate_color = ColorPlateLocate()
         img = plate_color.read_img(self._img)
-        plate_color.set_size(20, 70)
+        plate_color.set_size(50, 180)
         plate_color.set_img_hsv(255, 64, 95, 100, 140, 15, 40, 0, 30)
         plate_color.set_verify_value(1, 200, 4, .5)
         plate_color.set_morph_hw(10, 3)
