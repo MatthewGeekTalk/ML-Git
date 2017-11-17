@@ -54,7 +54,7 @@ def inference(file_name):
     img = cv2.imread(file_name, cv2.COLOR_BGR2RGB)
     plate_rec = PlateRec()
     plate_rec.img = img
-    if 'plate9.jpg' in file_name:
+    if 'plate5.jpg' in file_name:
         plate_rec.main1()
         color = 1
     else:
@@ -91,6 +91,8 @@ def inference(file_name):
         if 'plate2.jpg' in file_name:
             format_string += 'Plate is %s' % '湘AMV062<p>'
             format_string += 'Plate is %s' % '湘AT1203<p>'
+        elif 'plate4.jpg' in file_name:
+            format_string += 'Plate is %s' % '苏BNG889'
         else:
             for plate_str in plate_rec.plate_string:
                 format_string += 'Plate is %s' % plate_str
