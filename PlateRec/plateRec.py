@@ -3,7 +3,6 @@ import os
 import cv2
 import matplotlib.pyplot as plt
 import matplotlib.image as Image
-import time
 
 sys.path.insert(0, os.path.abspath('./'))
 from sobelPlateLocate import SobelPlateLocate
