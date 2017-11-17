@@ -124,8 +124,12 @@ if __name__ == "__main__":
                           + '/frozen_model.pb')
     graph_char = load_graph(FREEZE_MODEL_PATH_CHAR \
                             + '/frozen_model.pb')
+    sess_bc = tf.Session(graph=graph_bc)
+    sess_char = tf.Session(graph=graph_char)
     graph = Graph()
     graph.graph_bc = graph_bc
+    graph.sess_bc = sess_bc
     graph.graph_char = graph_char
+    graph.sess_char = sess_char
     print('listening on port 50050')
     app.run(host='0.0.0.0', port=50050)

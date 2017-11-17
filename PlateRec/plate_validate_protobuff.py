@@ -45,19 +45,20 @@ class PlateValidate(object):
         # Sample please refer to:
         # https://github.com/tensorflow/tensorflow/blob/master/tensorflow/python/tools/freeze_graph.py
 
-        with tf.Session(graph=graph.graph_bc) as sess:
-            x = sess.graph.get_tensor_by_name('prefix/x:0')
-            y = sess.graph.get_tensor_by_name('prefix/output/predict_sm:0')
-            keep_prob = sess.graph.get_tensor_by_name('prefix/keep_prob:0')
+        # with tf.Session(graph=graph.graph_bc) as sess:
+        sess = graph.sess_bc
+        x = sess.graph.get_tensor_by_name('prefix/x:0')
+        y = sess.graph.get_tensor_by_name('prefix/output/predict_sm:0')
+        keep_prob = sess.graph.get_tensor_by_name('prefix/keep_prob:0')
 
-            for i in range(len(self.in_imgs)):
-                logits = sess.run(y, feed_dict={
-                    x: self.in_imgs[i], keep_prob: .5
-                })
+        for i in range(len(self.in_imgs)):
+            logits = sess.run(y, feed_dict={
+                x: self.in_imgs[i], keep_prob: .5
+            })
 
-                logits = np.reshape(logits, [2])
-                logits = np.asarray(logits, dtype=np.int32)
-                self.imgs_labels.append(list(logits))
+            logits = np.reshape(logits, [2])
+            logits = np.asarray(logits, dtype=np.int32)
+            self.imgs_labels.append(list(logits))
 
     def main(self, imgs):
         self.imgs = imgs

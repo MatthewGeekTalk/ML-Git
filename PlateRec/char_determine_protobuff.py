@@ -42,20 +42,21 @@ class CharDetermine(object):
         #                           '/frozen_model.pb')
         graph = Graph()
 
-        with tf.Session(graph=graph.graph_char) as sess:
-            x = sess.graph.get_tensor_by_name('prefix/x:0')
-            y = sess.graph.get_tensor_by_name('prefix/output/predict_sm:0')
-            keep_prob = sess.graph.get_tensor_by_name('prefix/keep_prob:0')
+        # with tf.Session(graph=graph.graph_char) as sess:
+        sess = graph.sess_char
+        x = sess.graph.get_tensor_by_name('prefix/x:0')
+        y = sess.graph.get_tensor_by_name('prefix/output/predict_sm:0')
+        keep_prob = sess.graph.get_tensor_by_name('prefix/keep_prob:0')
 
-            for i in range(len(self.in_imgs)):
-                logits = sess.run(y, feed_dict={
-                    x: self.in_imgs[i],
-                    keep_prob: .5
-                })
+        for i in range(len(self.in_imgs)):
+            logits = sess.run(y, feed_dict={
+                x: self.in_imgs[i],
+                keep_prob: .5
+            })
 
-                logits = np.reshape(logits, [45])
-                logits = np.asarray(logits, dtype=np.int32)
-                self.imgs_labels.append(list(logits))
+            logits = np.reshape(logits, [45])
+            logits = np.asarray(logits, dtype=np.int32)
+            self.imgs_labels.append(list(logits))
 
     def main(self, imgs):
         self.imgs = imgs
