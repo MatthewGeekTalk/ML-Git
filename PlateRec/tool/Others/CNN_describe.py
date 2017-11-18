@@ -5,17 +5,18 @@ import matplotlib.pyplot as plt
 import cv2
 import tensorflow as tf
 
-PATH = os.path.abspath('../../Test/conv_photoes')
+PATH = os.path.abspath('../../../Test/conv_photoes')
 
 if __name__ == '__main__':
     dir(tf.contrib)
-    img = mpimg.imread(os.path.abspath('../0.jpg'))
+    img = mpimg.imread(os.path.abspath('SUA0CP56.jpg'))
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     img = cv2.resize(img, (70, 20), cv2.INTER_CUBIC)
     img = np.reshape(img, (-1, 4200))
 
     with tf.Session() as sess:
-        saver = tf.train.import_meta_graph('../module/bc-cnn2/binary_classification_CNN.ckpt.meta')
-        saver.restore(sess, '../module/bc-cnn2/binary_classification_CNN.ckpt')
+        saver = tf.train.import_meta_graph('../../module/bc-cnn2/binary_classification_CNN.ckpt.meta')
+        saver.restore(sess, '../../module/bc-cnn2/binary_classification_CNN.ckpt')
         graph = tf.get_default_graph()
         x = graph.get_tensor_by_name('x:0')
         conv1 = graph.get_tensor_by_name('conv1/conv_relu:0')
