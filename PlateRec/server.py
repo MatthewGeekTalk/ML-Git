@@ -84,7 +84,7 @@ def inference(file_name):
                 image_tag_cut = '<img src="%s"></img><p>'
                 new_tag_cut = new_tag_cut + image_tag_cut % new_url_cut
         new_url = '/static/%s' % os.path.basename(img_path)
-        image_tag = '<img src="%s"></img><p>'
+        image_tag = '<img src="%s" width=650px></img><p>'
         new_tag = image_tag % new_url
         Image.imsave(img_path, plate)
         format_string = ''
